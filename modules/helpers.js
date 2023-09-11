@@ -16,7 +16,7 @@ const helpers = {
         return ~~((Math.random() * (max - min + (1 / dec)) + min) * dec) / dec;
     },
     // Erzeugen einer zufälligen Farbe
-    createColor({ minHue = 0, maxHue = 360, minSat = 70, maxSat = 80, minLight = 60, maxLight = 80, minAlpha = 1, maxAlpha = 1 }) {
+    createColor({ minHue = 0, maxHue = 360, minSat = 70, maxSat = 80, minLight = 60, maxLight = 80, minAlpha = 1, maxAlpha = 1 }={}) {
         let rnd = helpers.createNumber;
         return `hsla(${rnd(minHue, maxHue)}, ${rnd(minSat, maxSat)}%, ${rnd(minLight, maxLight)}%, ${rnd(minAlpha * 100, maxAlpha * 100) / 100})`;
     },
