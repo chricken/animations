@@ -8,6 +8,20 @@ import noises, { Perlin } from '../../../modules/noises.js';
 let zoom = 100;
 
 const draw = {
+    saveToServer(c) {
+        return new Promise(resolve => {
+
+            // Get the canvas data as a URL
+            const cDataURL = c.toDataURL('image/png');
+
+            // Create a blob from the canvas data URL
+            const canvasBlob = new Blob([cDataURL], { type: 'image/png' });
+
+            console.log(canvasBlob);
+
+            resolve();
+        })
+    },
     render() {
         let c = elements.c;
         // console.log(settings.z);
@@ -34,10 +48,17 @@ const draw = {
         // console.log(imgData);
         ctx.putImageData(imgData, 0, 0);
 
-        settings.z += 3
-        settings.x += 1
+        settings.x += 1;
+        settings.y += -2;
+        settings.z += 3;
 
-        requestAnimationFrame(render);
+        draw.saveToServer(c).then(
+            () => requestAnimationFrame(render)
+        ).catch(
+            console.warn
+        )
+
+
     }
 }
 

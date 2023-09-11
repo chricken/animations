@@ -47,6 +47,8 @@ const init = () => {
     createRandom();
     requestAnimationFrame(render);
 
+    
+
 }
 
 init();
