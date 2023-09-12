@@ -14,8 +14,8 @@ const fillApp = () => {
         type: 'canvas',
         parent: elements.main,
         attr: {
-            width: 800,
-            height: 500
+            width:  3840/2,
+            height: 2160/2
         }
     })
 }

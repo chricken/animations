@@ -16,7 +16,7 @@ const helpers = {
         return ~~((Math.random() * (max - min + (1 / dec)) + min) * dec) / dec;
     },
     // Erzeugen einer zufälligen Farbe
-    createColor({ minHue = 0, maxHue = 360, minSat = 70, maxSat = 80, minLight = 60, maxLight = 80, minAlpha = 1, maxAlpha = 1 }={}) {
+    createColor({ minHue = 0, maxHue = 360, minSat = 70, maxSat = 80, minLight = 60, maxLight = 80, minAlpha = 1, maxAlpha = 1 } = {}) {
         let rnd = helpers.createNumber;
         return `hsla(${rnd(minHue, maxHue)}, ${rnd(minSat, maxSat)}%, ${rnd(minLight, maxLight)}%, ${rnd(minAlpha * 100, maxAlpha * 100) / 100})`;
     },
@@ -26,16 +26,36 @@ const helpers = {
         console.log(settings.path);
         let image = c.toDataURL('image/png');  // Wandelt das Canvas in eine Data URL um
         let a = document.createElement('a');        // Erstellt einen neuen Download-Link
-    
+
         a.href = image;                             // Setzt den Link auf das Bild
         a.download = settings.path;             // Legt den Namen der heruntergeladenen Datei fest
-        a.click();  
-        
+        a.click();
+
     },
     leadingZero(num, dec = 0) {
-        let str = '0000000000';
+        let str = '00000000000000000';
         return (str + num).substr(-dec);
 
+    },
+    // Helper function to convert base64 image content to a blob
+    base64ToBlob(base64, mime) {
+        mime = mime || '';
+        let sliceSize = 1024;
+        let byteChars = window.atob(base64);
+        let byteArrays = [];
+
+        for (let offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+            let slice = byteChars.slice(offset, offset + sliceSize);
+            let byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            let byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, { type: mime });
     }
 }
 
@@ -43,3 +63,4 @@ export default helpers;
 export let RtA = helpers.relToAbs;
 export let rnd = helpers.createNumber;
 export let saveC = helpers.writeCToFile;
+export let lead0 = helpers.leadingZero;
