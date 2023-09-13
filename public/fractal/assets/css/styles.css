@@ -1,0 +1,9 @@
+.svgCloud {
+    /* display:none; */
+}
+canvas {
+    position: relative;
+    display: block;
+    width: 800px;
+    height:auto;
+}
