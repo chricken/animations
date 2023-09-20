@@ -18,9 +18,15 @@ const draw = {
 
         let fractal = new MandelbrotFractal();
         // fractal.draw();
-        fractal.draw(-2.0, -1, 1, 1)
+        fractal.draw(
+            0 - settings.posX,
+            0 - settings.posY,
+            (0 - settings.posX) + (settings.zoom),
+            (0 - settings.posY) + (settings.zoom * settings.proportions),
+        )
 
         // Bildinhalt an server senden und dort speichern
+        /*
         ajax.saveCanvasToServer(c, `image_${lead0(fileNo, 6)}.png`).then(
             () => fileNo++
         ).then(
@@ -28,7 +34,7 @@ const draw = {
         ).catch(
             console.warn
         )
-
+        */
 
     }
 }

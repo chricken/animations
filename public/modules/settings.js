@@ -8,6 +8,8 @@ const settings = {
     },
     fileIndex: 0,
     basePath: '',
+    numPoints:100,
+    padding:100,
     get path() {
         let result = `${settings.basePath}_${helpers.leadingZero(settings.fileIndex, 4)}.png`;
         settings.fileIndex++;

@@ -47,6 +47,7 @@ class MandelbrotFractal {
 
     // Eine bestimmte Zoom-Position anspringen
     draw(startX, startY, endX, endY) {
+        ctx.clearRect(0,0,c.width, c.height)
         const scaleX = (endX - startX) / c.width;
         const scaleY = (endY - startY) / c.height;
 
