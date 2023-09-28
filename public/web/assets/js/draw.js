@@ -100,9 +100,9 @@ const draw = {
 
             // Bogen verändern
             divisor += 1;
-            // requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
 
-
+            /*
             ajax.saveCanvasToServer(c, `image_${lead0(fileNo, 6)}.png`).then(
                 () => {
                     fileNo++;
@@ -113,7 +113,7 @@ const draw = {
             ).catch(
                 console.warn
             )
-
+                */
 
         }
 

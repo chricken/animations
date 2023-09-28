@@ -21,6 +21,11 @@ const helpers = {
         return `hsla(${rnd(minHue, maxHue)}, ${rnd(minSat, maxSat)}%, ${rnd(minLight, maxLight)}%, ${rnd(minAlpha * 100, maxAlpha * 100) / 100})`;
     },
 
+    // Pythagoras - a² = b² + c²
+    pythagoras(a, b) {
+        return Math.sqrt(a * a + b * b);
+    },
+
     // Inhalt des Canvas in eine Datei schreiben
     writeCToFile(c = elements.c) {
         console.log(settings.path);
