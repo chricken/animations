@@ -25,7 +25,8 @@ const fillApp = () => {
 
 const init = () => {
     settings.numPoints = 2000;
-    settings.threshold = 100;
+    settings.threshold = 200;
+    settings.maxAbweichung = 100;
     settings.numAttractors = 0;
     settings.basePath = '../results/img';
     domMapping();
