@@ -7,12 +7,14 @@ import Point from './classes/point.js';
 import Attractor from './classes/attractor.js';
 
 let fileNo = 0;
-let distanceEnhancer = .05;
+let distanceEnhancer = 1.2;
 
 const draw = {
 
     voronoy() {
         let imgData = elements.ctx.getImageData(0, 0, elements.c.width, elements.c.height);
+        let nearestNearest = Infinity;
+        let farestNearest = 0;
         for (let i = 0; i < imgData.data.length; i += 4) {
 
             let x = (i / 4) % imgData.width;
@@ -27,15 +29,24 @@ const draw = {
                     y - point.y
                 )
                 nearestPoint = (distance < nearestPoint.distance) ? { distance, point } : nearestPoint;
+                /*
+                nearestNearest = (nearestPoint.distance < nearestNearest) ? nearestPoint.distance : nearestNearest;
+                farestNearest = (nearestPoint.distance > farestNearest) ? nearestPoint.distance : farestNearest;
+                */
             }
             // let amp = (nearestPoint.distance ** (1 / distanceEnhancer));
-            let amp = nearestPoint.distance * distanceEnhancer;
-            imgData.data[i] = ~~(nearestPoint.point.r / amp);
-            imgData.data[i + 1] = ~~(nearestPoint.point.g / amp);
-            imgData.data[i + 2] = ~~(nearestPoint.point.b / amp);
+            let amp = 255 / (nearestPoint.distance * distanceEnhancer);
+            let maxValue = 150;
+            imgData.data[i] = maxValue - ~~(nearestPoint.point.r / amp);
+            imgData.data[i + 1] = maxValue - ~~(nearestPoint.point.g / amp);
+            imgData.data[i + 2] = maxValue - ~~(nearestPoint.point.b / amp);
             imgData.data[i + 3] = 255;
         }
         elements.ctx.putImageData(imgData, 0, 0);
+        /*
+        console.log(nearestNearest);
+        console.log(farestNearest);
+        */
     },
 
     animate() {
@@ -48,13 +59,16 @@ const draw = {
 
         settings.points.forEach(point => point.move());
         settings.attractors.forEach(attr => attr.move());
+        // console.log('Calculation stratet!');
+        // console.time()
 
         draw.voronoy();
 
+        // console.timeEnd()
         // Bogen verändern
-        //requestAnimationFrame(draw.animate);
+        // requestAnimationFrame(draw.animate);
 
-
+        
         ajax.saveCanvasToServer(elements.c, `image_${lead0(fileNo, 6)}.png`).then(
             () => {
                 fileNo++;
@@ -65,6 +79,7 @@ const draw = {
         ).catch(
             console.warn
         )
+        
 
     },
     init() {

@@ -22,6 +22,23 @@ const helpers = {
     },
 
     // Pythagoras - a² = b² + c²
+    pythagorasPoints(point1, point2) {
+        let a = 0, b = 0;
+        if (point1.x) {
+            a = point1.x - point2.x;
+            b = point1.y - point2.y;
+        }
+        if (point1.posX) {
+            a = point1.posX - point2.posX;
+            b = point1.posY - point2.posY;
+        }
+        if (a != 0 && b != 0) {
+            return Math.sqrt(a * a + b * b);
+        } else {
+            return Infinity;
+        }
+
+    },
     pythagoras(a, b) {
         return Math.sqrt(a * a + b * b);
     },

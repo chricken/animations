@@ -15,8 +15,8 @@ class Point {
         // console.log(settings.padding, elements.c.width);
         this.x = rnd(0, elements.c.width);
         this.y = rnd(0, elements.c.height);
-        this.vx = rnd(-20, 20) / 50;
-        this.vy = rnd(-20, 20) / 50;
+        this.vx = rnd(-20, 20) / 20;
+        this.vy = rnd(-20, 20) / 20;
         this.size = rnd(.1, 1);
 
         // Farbwerte
