@@ -1,0 +1,14 @@
+.svgCloud {
+    /* display:none; */
+}
+canvas {
+    position: relative;
+    display:inline;
+    width: 800px;
+    height:auto;
+    background-color: #000;
+}
+canvas.perlin {
+    display: inline;
+    width:400px;
+}
