@@ -14,8 +14,7 @@ class Point {
         this.distance = Infinity;
         this.nearestDistance = 0;
         this.size = rnd(.5, 2);
-        this.damping = .0;
-        this.maxSpeed = .5;
+        this.damping = 0;
     }
     draw() {
 
@@ -51,8 +50,6 @@ class Point {
         })
         this.vx /= 1 + this.damping;
         this.vy /= 1 + this.damping;
-        this.vx = Math.min(this.vx, this.maxSpeed)
-        this.vy = Math.min(this.vy, this.maxSpeed)
         this.x += this.vx / (1 / this.size);
         this.y += this.vy / (1 / this.size);
     }

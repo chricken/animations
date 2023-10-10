@@ -3,17 +3,15 @@
 import helpers, { rnd } from '../../../../modules/helpers.js';
 import settings, { elements } from '../../../../modules/settings.js';
 
-const speeds = [.5,.3,.8,-.4,-.7];
-
 class Attractor {
     constructor() {
         // console.log(settings.padding, elements.c.width);
         this.x = rnd(0, elements.c.width);
         this.y = rnd(0, elements.c.height);
-        this.vx =speeds[(rnd(0,speeds.length-1))]/3;
-        this.vy = speeds[(rnd(0,speeds.length-1))]/3;
-        this.strength = 2;
-        this.size = 10;
+        this.vx = rnd(-20, 20) / 50;
+        this.vy = rnd(-20, 20) / 50;
+        this.strength = .5;
+        this.size = 0;
     }
 
     move() {

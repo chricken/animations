@@ -11,6 +11,9 @@ const settings = {
     numPoints:100,
     padding:100,
     numImages:11000,
+    maxAbweichung:50,
+    saveFile:false,
+    animate:true,
     get path() {
         let result = `${settings.basePath}_${helpers.leadingZero(settings.fileIndex, 4)}.png`;
         settings.fileIndex++;

@@ -27,10 +27,10 @@ const init = () => {
     settings.numPoints = 3000;
     settings.threshold = 100;
     settings.maxAbweichung = 10;
-    settings.numAttractors = 1;
+    settings.numAttractors = 3;
     settings.basePath = '../results/img';
     settings.animate = true;
-    settings.saveFile = false;
+    settings.saveFile = true;
     domMapping();
     fillApp();
     // createRandom();
