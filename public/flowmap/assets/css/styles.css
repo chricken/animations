@@ -1,0 +1,10 @@
+.svgCloud {
+    /* display:none; */
+}
+canvas {
+    position: relative;
+    display: inline;
+    width: 800px;
+    height:auto;
+    background-color: #000;
+}
