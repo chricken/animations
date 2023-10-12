@@ -22,10 +22,10 @@ const fillApp = () => {
 
 const init = () => {
     settings.basePath = '../results/img';
-    settings.saveFile = true;
+    settings.saveFile = false;
     settings.cSize = {
-        x: 600,
-        y: 300,
+        x: 1000,
+        y: 500,
     }
     domMapping();
     fillApp();
