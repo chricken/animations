@@ -32,10 +32,10 @@ const helpers = {
             a = point1.posX - point2.posX;
             b = point1.posY - point2.posY;
         }
-        if (a != 0 && b != 0) {
-            return Math.sqrt(a * a + b * b);
-        } else {
+        if (a == 0 && b == 0) {
             return Infinity;
+        } else {
+            return Math.sqrt(a * a + b * b);
         }
 
     },

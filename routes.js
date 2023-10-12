@@ -30,6 +30,9 @@ router.post('/save_image', (req, res) => {
                     uploadDir + file.originalFilename,
                     err => {
                         if (err) console.log(err)
+                        else {
+                            console.log(file.originalFilename);
+                        }
                     }
                 )
             })

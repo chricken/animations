@@ -8,12 +8,16 @@ const settings = {
     },
     fileIndex: 0,
     basePath: '',
-    numPoints:100,
-    padding:100,
-    numImages:11000,
-    maxAbweichung:50,
-    saveFile:false,
-    animate:true,
+    numPoints: 100,
+    padding: 100,
+    numImages: 11000,
+    maxAbweichung: 50,
+    saveFile: false,
+    animate: true,
+    cSize: {
+        x: 600,
+        y: 600,
+    },
     get path() {
         let result = `${settings.basePath}_${helpers.leadingZero(settings.fileIndex, 4)}.png`;
         settings.fileIndex++;

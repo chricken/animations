@@ -14,8 +14,8 @@ class Point {
         this.distance = Infinity;
         this.nearestDistance = 0;
         this.size = rnd(.5, 2);
-        this.damping = .0;
-        this.maxSpeed = .5;
+        this.damping = .01;
+        this.maxSpeed = .03;
     }
     draw() {
 
@@ -43,11 +43,10 @@ class Point {
         this.checkBorders();
     }
     move() {
-        let vy = this.vy;
         settings.attractors.forEach(attr => {
             let distance = helpers.pythagoras(this.x - attr.x, this.y - attr.y);
-            this.vx += ((attr.x - this.x) * this.size) / (distance ** 2) * attr.strength;
-            this.vy += ((attr.y - this.y) * this.size) / (distance ** 2) * attr.strength;
+            this.vx += ((attr.x - this.x) /** this.size*/) / (distance ** 2) * attr.strength;
+            this.vy += ((attr.y - this.y) /** this.size*/) / (distance ** 2) * attr.strength;
         })
         this.vx /= 1 + this.damping;
         this.vy /= 1 + this.damping;
