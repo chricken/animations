@@ -1,70 +1,109 @@
 'use strict';
 
-import settings, { elements } from '/public/modules/settings.js';
-import helpers, { rnd } from '/public/modules/helpers.js';
+import settings, { elements } from '../../../../modules/settings.js';
+import helpers, { rnd, lead0 } from '../../../../modules/helpers.js';
+import ajax from '../../../../modules/ajax.js';
+import addition from './addition.js';
+import tables from './tables.js';
 
 let fileNo = 0;
 
 class RainbowSmoke {
-    constructor() {
+    pxTableindex = 0;
 
-        this.fillPxTable();
-
-        this.fillColorTable();
-
-        // StartPixel auf einen zufälligen Wert setzen
-        this.startPixel = {
+    constructor({
+        additionInflux = 10,
+        additionInvert = true,
+        showNoiseMult = 100,
+        noiseZoom = 60,
+        dividerSimilarity = 1000,
+        additionFilename = 'Apophysis-2.png',
+        numIterationsPerUpdate = 300,
+        startPixel = {
             x: rnd(0, settings.cSize.x),
             y: rnd(0, settings.cSize.y),
-        }
+        },
+        additionToUse = 'fillAdditionTableImg',
+        addNoise=0,
+    } = {}) {
 
-        this.pxTable[this.startPixel.y][this.startPixel.x] = [
-            rnd(0, 255),
-            rnd(0, 255),
-            rnd(0, 255),
-        ];
+        // Einfluss des Additiontables auf die Farbverteilung
+        this.additionInflux = additionInflux;
+
+        // Ob die Addition umgekehrt interpretiert werden soll
+        // true: hellere Bereiche werden früher gefüllt.
+        this.additionInvert = additionInvert;
+
+        // Multiplier, um beim Rendern die Noise anzuzeigen
+        this.showNoiseMult = showNoiseMult;
+
+        // Zoom für Addition Noise
+        this.noiseZoom = noiseZoom;
+
+        // Zusätzliches Rauschen für die Addition
+        this.addNoise = addNoise;
+
+        // Divider, der das Finden ähnlich-farbiger Pixel beschleunigt 
+        // auf Kosten der Qualität
+        // Niedrigere Zahl = schneller/Schlechter
+        this.dividerSimilarity = dividerSimilarity;
+
+        // URL zum zu ladenden Bild für die Addition
+        this.additionURL = './assets/img/' + additionFilename;
+
+        // Anzahl der Updates, die je Iteration gemacht werden sollen
+        // const numIterationsPerUpdate = numIterationsPerUpdate;
+
+        // Addition-Methoden eintragen
+        Object.entries(addition).forEach(([key, value]) => {
+            // console.log(key, value);
+            this[key] = value.bind(this);
+        })
+
+        Object.entries(tables).forEach(([key, value]) => {
+            // console.log(key, value);
+            this[key] = value.bind(this);
+        })
+
+        // StartPixel auf einen zufälligen Wert setzen
+        this.startPixel = startPixel;
+
         console.log(this.startPixel.x, this.startPixel.y);
 
-        // Nächsten 
-        this.iterate(20);
-    }
+        this[additionToUse]().then(
+            () => {
+                this.fillPxTable();
+                this.sortPxTable();
+                this.fillColorTable();
+                this.sortColorTable();
 
-    // Array für die Pixel vorbereiten
-    fillPxTable() {
-        // 2-Dimensionales Array mit den Pixeln des Canvas
-        // In diesem Array wird beim Rendern die null durch Farben überschrieben
-        // Diese Farben werden beim Rendern in Farben umgesetzt
-        this.pxTable = [];
-        for (let y = 0; y < settings.cSize.y; y++) {
-            this.pxTable.push([])
-            for (let x = 0; x < settings.cSize.x; x++) {
-                this.pxTable[y].push(null);
+                this.pxTable2D[this.startPixel.y][this.startPixel.x].color = [
+                    rnd(0, 255),
+                    rnd(0, 255),
+                    rnd(0, 255),
+                ];
+
+                // console.log('startColor', this.pxTable2D[this.startPixel.y][this.startPixel.x]);
+                console.log('Start Update and Render');
+                // Nächste Runde
+                this.iterate(numIterationsPerUpdate)
+                // this.update();
+                // this.render()
             }
-        }
+        )
     }
 
-    // Farbtabelle füllen
-    fillColorTable() {
-        let numAllColors = 256 ** 3;
-        let numPx = settings.cSize.x * settings.cSize.y;
-        let colorInkrement = numAllColors / numPx;
-
-        this.colorTable = [];
-        // Schleife, die für jeden Pixel eine Farbe in ein Array schreibt
-        // Die Farben sind gleichmäßig über das 8bit-RGB-Farbsystem verteilt
-        for (let i = 0; i < numAllColors; i += colorInkrement) {
-            let color = Math.round(i).toString(16);
-            color = helpers.leadingZero(color, 6);
-            let r = color[0] + color[1];
-            let g = color[2] + color[3];
-            let b = color[4] + color[5];
-            r = parseInt(r, 16);
-            g = parseInt(g, 16);
-            b = parseInt(b, 16);
-            this.colorTable.push([r, g, b]);
-        }
-        console.log(this.colorTable);
-
+    // Den nächsten Pixel finden und füllen
+    update() {
+        // console.time()
+        let nextPx = this.findNextPixel();
+        let envColor = this.findEnvColor(nextPx);
+        // console.log('envColor', envColor);
+        let nextColor = this.findNearestColor(envColor);
+        // console.log('nextColor', nextColor);
+        nextPx.color = nextColor.color.color;
+        // console.log('nextPx', nextPx);
+        // console.timeEnd()
     }
 
     // Aus dem Colortable die ähnlichste Farbe finden und diese aus dem Colortable entfernen
@@ -73,8 +112,9 @@ class RainbowSmoke {
             distance: Infinity,
             colors: []
         }
+
         // console.log(this.colorTable);
-        for (let i = 0; i < this.colorTable.length; i++) {
+        for (let i = 0; i < this.colorTable.length; i += 3) {
             let tableColor = this.colorTable[i];
             let distance = this.calcDistance(color, tableColor);
 
@@ -94,7 +134,22 @@ class RainbowSmoke {
                     }]
                 }
             }
+
+            // Wenn eine Schwellengenauigkeit erreicht ist, brich die Schleife ab
+            // console.log(distance, this.thresholdSimilarity, i,this.colorTable.length );
+            // Dies soll nur getMaxListeners, wenn noch genügend Farben zur Verfügung stehen
+            /*if (
+                distance <= this.thresholdSimilarity &&
+                this.colorTable.length > this.thresholdSimilarity * 10
+            ) {
+                break;
+            }*/
+            // bessere Variante 
+            if (distance < this.colorTable.length / this.dividerSimilarity) {
+                break
+            }
         }
+
         // Aus den Farben eine zufällige Farbe wählen
         let col = nearestColors.colors;
         // console.log(nearestColors);
@@ -105,45 +160,35 @@ class RainbowSmoke {
             color: col[index]
         };
         this.colorTable.splice(col.color.index, 1);
+
         return col;
 
     }
 
     // nächsten zu rendernden Pixel finden
     findNextPixel() {
-        let nearestPx = {
-            distance: Infinity,
-        }
-
-        // pxTable iterieren
-        for (let y = 0; y < this.pxTable.length; y++) {
-            for (let x = 0; x < this.pxTable[y].length; x++) {
-                // Schon gefüllte Pixel überspringen
-                if (this.pxTable[y][x] == null) {
-                    let distance = helpers.pythagorasPoints(
-                        { x, y },
-                        this.startPixel
-                    )
-                    if (distance < nearestPx.distance) {
-                        nearestPx = { distance, x, y }
-                    }
-                    // console.log(x, y, distance);
-                }
-            }
-        }
+        this.pxTableindex++;
+        let nearestPx = this.pxTable[this.pxTableindex];
         return nearestPx;
     }
 
     // Übertragen des pxTables in das Canvas
     render() {
         let imgData = elements.ctx.getImageData(0, 0, settings.cSize.x, settings.cSize.y);
-        for (let y = 0; y < this.pxTable.length; y++) {
-            for (let x = 0; x < this.pxTable[y].length; x++) {
-                if (this.pxTable[y][x]) {
+        for (let y = 0; y < this.pxTable2D.length; y++) {
+            for (let x = 0; x < this.pxTable2D[y].length; x++) {
+                if (this.pxTable2D[y][x].color) {
+                    // console.log(this.pxTable2D[y][x]);
                     // Aus den Imagedaten den richtigen Pixel nehmen und färben
-                    imgData.data[((y * settings.cSize.x) + x) * 4] = this.pxTable[y][x][0];
-                    imgData.data[((y * settings.cSize.x) + x) * 4 + 1] = this.pxTable[y][x][1];
-                    imgData.data[((y * settings.cSize.x) + x) * 4 + 2] = this.pxTable[y][x][2];
+                    imgData.data[((y * settings.cSize.x) + x) * 4] = this.pxTable2D[y][x].color[0];
+                    imgData.data[((y * settings.cSize.x) + x) * 4 + 1] = this.pxTable2D[y][x].color[1];
+                    imgData.data[((y * settings.cSize.x) + x) * 4 + 2] = this.pxTable2D[y][x].color[2];
+                    imgData.data[((y * settings.cSize.x) + x) * 4 + 3] = 255;
+                } else {
+                    let value = (this.additionTable[y][x] * this.showNoiseMult);
+                    imgData.data[((y * settings.cSize.x) + x) * 4] = value;
+                    imgData.data[((y * settings.cSize.x) + x) * 4 + 1] = value;
+                    imgData.data[((y * settings.cSize.x) + x) * 4 + 2] = value;
                     imgData.data[((y * settings.cSize.x) + x) * 4 + 3] = 255;
                 }
             }
@@ -151,40 +196,43 @@ class RainbowSmoke {
         elements.ctx.putImageData(imgData, 0, 0);
     }
 
-    // Den nächsten Pixel finden und füllen
-    update() {
-        let nextPx = this.findNextPixel();
-        let envColor = this.findEnvColor(nextPx);
-        let nextColor = this.findNearestColor(envColor);
-        this.pxTable[nextPx.y][nextPx.x] = nextColor.color.color;
-        this.render();
-    }
-    iterate(numIterations = 10) {
+    iterate(numIterations = 100) {
+        // console.log('iterate', numIterations);
         for (let i = 0; i < numIterations; i++) {
             this.update()
         }
+        this.render();
+
         // Animation
         if (settings.saveFile) {
             ajax.saveCanvasToServer(elements.c, `image_${lead0(fileNo, 6)}.png`).then(
                 () => {
                     fileNo++;
-                    if (fileNo <= 10800) {
-                        this.animate()
-                        if (this.colorTable.length > numIterations+1)
-                            requestAnimationFrame(() => this.iterate(numIterations));
+                    // this.animate()
+                    if (this.colorTable.length > numIterations + 1) {
+                        requestAnimationFrame(() => this.iterate(numIterations));
+                    } else {
+
+                        console.timeEnd()
                     }
                 }
             ).catch(
                 console.warn
             )
         } else {
-            if (this.colorTable.length > numIterations+1)
+            if (this.colorTable.length > numIterations) {
                 requestAnimationFrame(() => this.iterate(numIterations));
+            } else {
+                if (this.colorTable.length > 1) {
+                    requestAnimationFrame(() => this.iterate(~~(numIterations / 2)));
+                }
+                // console.timeEnd()
+            }
         }
     }
 
     // Die umgebenden Pixel nach der Farbe analysieren und den Durchschnittt bilden
-    findEnvColor({ x, y }) {
+    findEnvColor({ x, y } = {}) {
         // console.log(x, y);
         let color = [0, 0, 0];
         let numFoundPx = 0;
@@ -200,13 +248,14 @@ class RainbowSmoke {
                     y + dY >= 0 &&
                     y + dY < settings.cSize.y
                 ) {
-                    let px = this.pxTable[y + dY][x + dX];
+                    // console.log(y + dY, x + dX);
+                    let px = this.pxTable2D[y + dY][x + dX];
                     // console.log(dX, dY);
                     // console.log(px);
-                    if (px != null) {
-                        color[0] += px[0];
-                        color[1] += px[1];
-                        color[2] += px[2];
+                    if (px.color != null) {
+                        color[0] += px.color[0];
+                        color[1] += px.color[1];
+                        color[2] += px.color[2];
                         numFoundPx++;
                     }
                 }
