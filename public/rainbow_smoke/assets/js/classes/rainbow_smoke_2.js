@@ -8,10 +8,10 @@ import noises, { Perlin } from '../../../../modules/noises.js';
 let fileNo = 0;
 
 class Px {
-    constructor(x, y, distance) {
+    constructor({ x, y, distance } = {}) {
         this.x = x;
         this.y = y;
-        this.status = 'unset';
+        // this.status = 'unset';
         this.index = null;
         this.distance = distance;
         this.color = null;
@@ -23,10 +23,14 @@ class RainbowSmoke {
         this.pxTableindex = 0;
 
         // Einfluss des Additiontables auf die Farbverteilung
-        this.additionInflux = 70;
+        this.additionInflux = 50;
+
+        // Ob die Addition umgekehrt interpretiert werden soll
+        // true: hellere Bereiche werden früher gefüllt.
+        this.additionInvert = true;
 
         // Multiplier, um beim Rendern die Noise anzuzeigen
-        this.showNoiseMult = 100
+        this.showNoiseMult = 0
 
         // Zoom für Addition Noise
         this.zoom = 60;
@@ -34,10 +38,16 @@ class RainbowSmoke {
         // Divider, der das Finden ähnlich-farbiger Pixel beschleunigt 
         // auf Kosten der Qualität
         // Niedrigere Zahl = schneller/Schlechter
-        this.dividerSimilarity = 15000;
+        this.dividerSimilarity = 5000;
+
+        // URL zum zu ladenden Bild für die Addition
+        this.additionURL = './assets/img/Apophysis-2.png';
 
 
-        console.time();
+        // Anzahl der Updates, die je Iteration gemacht werden sollen
+        const numIterationsPerUpdate = 300;
+
+        // console.time();
 
         // this.thresholdSimilarity = 20;
 
@@ -49,28 +59,34 @@ class RainbowSmoke {
 
         console.log(this.startPixel.x, this.startPixel.y);
 
-        this.fillAdditionTablePerlin()
+        // this.fillAdditionTableSinus().then(
 
-        this.fillPxTable();
+        // this.fillAdditionTablePerlin().then(
 
-        this.sortPxTable();
+        this.fillAdditionTableImg().then(
+            () => {
+                this.fillPxTable();
 
-        this.fillColorTable();
+                this.sortPxTable();
 
-        this.sortColorTable();
+                this.fillColorTable();
 
-        this.pxTable2D[this.startPixel.y][this.startPixel.x].color = [
-            rnd(0, 255),
-            rnd(0, 255),
-            rnd(0, 255),
-        ];
+                this.sortColorTable();
 
-        // console.log('startColor', this.pxTable2D[this.startPixel.y][this.startPixel.x]);
+                this.pxTable2D[this.startPixel.y][this.startPixel.x].color = [
+                    rnd(0, 255),
+                    rnd(0, 255),
+                    rnd(0, 255),
+                ];
 
-        // Nächsten 
-        this.iterate(500);
-        // this.update();
-        // this.render()
+                // console.log('startColor', this.pxTable2D[this.startPixel.y][this.startPixel.x]);
+                console.log('Start Update and Render');
+                // Nächsten 
+                this.iterate(numIterationsPerUpdate)
+                // this.update();
+                // this.render()
+            }
+        )
 
     }
 
@@ -92,48 +108,97 @@ class RainbowSmoke {
     fillAdditionTableSinus() {
         this.additionTable = [];
 
-        for (let y = 0; y < settings.cSize.y; y++) {
-            this.additionTable.push([]);
-            for (let x = 0; x < settings.cSize.x; x++) {
-                // Das Array soll mit Zahlen zwischen 0 und 1 gefüllt sein
-                this.additionTable[y].push((Math.sin(x * 180 / Math.PI) + 1) / 2);
+        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+        return new Promise((resolve, reject) => {
+            for (let y = 0; y < settings.cSize.y; y++) {
+                this.additionTable.push([]);
+                for (let x = 0; x < settings.cSize.x; x++) {
+                    // Das Array soll mit Zahlen zwischen 0 und 1 gefüllt sein
+                    this.additionTable[y].push((Math.sin(x * 180 / Math.PI) + 1) / 2);
+                }
             }
-        }
+            resolve();
+        })
     }
     fillAdditionTablePerlin() {
         this.additionTable = [];
 
-        // Zufallswerte
-        const p = new Uint8Array([
-            ...[...new Array(6)].map(() => rnd(1, 254)),
-            ...(() => {
-                let p = [], i;
-                for (i = 0; i < 256; i++) p[i] = i;
-                for (i = 0; i < 255; i++) {
-                    let t, j = Math.floor((i + 1) * Math.random());
-                    t = p[j]; p[j] = p[j + 1]; p[j + 1] = t;
+        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+        return new Promise((resolve, reject) => {
+            // Zufallswerte
+            const p = new Uint8Array([
+                ...[...new Array(6)].map(() => rnd(1, 254)),
+                ...(() => {
+                    let p = [], i;
+                    for (i = 0; i < 256; i++) p[i] = i;
+                    for (i = 0; i < 255; i++) {
+                        let t, j = Math.floor((i + 1) * Math.random());
+                        t = p[j]; p[j] = p[j + 1]; p[j + 1] = t;
+                    }
+                    return p;
+                })()]);
+
+            const perlin = new Perlin(p);
+
+            for (let y = 0; y < settings.cSize.y; y++) {
+                this.additionTable.push([]);
+                for (let x = 0; x < settings.cSize.x; x++) {
+                    let [x1, y1, z1] = [x / this.zoom, y / this.zoom, 0];
+                    let [x2, y2, z2] = [x / this.zoom * 4, y / this.zoom * 4, 100];
+                    let val1 = (perlin.noise(x1, y1, z1) + 1) / 2;
+                    let val2 = (perlin.noise(x2, y2, z2) + 1) / 2;
+                    let val = (val1 * 2 + val2) / 3;
+                    // Das Array soll mit Zahlen zwischen 0 und 1 gefüllt sein
+                    this.additionTable[y].push(val);
                 }
-                return p;
-            })()]);
-
-        const perlin = new Perlin(p);
-
-        for (let y = 0; y < settings.cSize.y; y++) {
-            this.additionTable.push([]);
-            for (let x = 0; x < settings.cSize.x; x++) {
-                let [x1, y1, z1] = [x / this.zoom, y / this.zoom, 0];
-                let [x2, y2, z2] = [x / this.zoom * 4, y / this.zoom * 4, 100];
-                let val1 = (perlin.noise(x1, y1, z1) + 1) / 2;
-                let val2 = (perlin.noise(x2, y2, z2) + 1) / 2;
-                let val = (val1 *2 + val2) / 3;
-                // Das Array soll mit Zahlen zwischen 0 und 1 gefüllt sein
-                this.additionTable[y].push(val);
             }
-        }
+
+            resolve();
+        })
+    }
+    fillAdditionTableImg() {
+        this.additionTable = [];
+
+        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+        return new Promise((resolve, reject) => {
+
+            const cAddition = document.createElement('canvas');
+            const ctx = cAddition.getContext('2d');
+            cAddition.width = settings.cSize.x;
+            cAddition.height = settings.cSize.y;
+
+            document.body.append(cAddition);
+            console.log('FillAdditionTable');
+
+            // Bild laden
+            const imgAddition = document.createElement('img');
+            imgAddition.addEventListener('load', () => {
+                ctx.drawImage(imgAddition, 0, 0, cAddition.width, cAddition.height);
+
+                // AdditionTable füllen
+                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+
+                for (let y = 0; y < cAddition.height; y++) {
+                    this.additionTable.push([])
+                    for (let x = 0; x < cAddition.width; x++) {
+                        let index = (y * cAddition.width + x) * 4;
+                        let idt = imgData.data;
+                        let value = (idt[index] + idt[index + 1] + idt[index + 2])
+                        value /= 3;
+                        value /= 255
+                        this.additionTable[y].push([value]);
+                    }
+                }
+
+                resolve();
+            })
+            imgAddition.src = this.additionURL;
+        })
     }
 
     // Array für die Pixel vorbereiten
     fillPxTable() {
+        console.log('fillPxTable');
         // 1-Dimensionales Array mit den Pixeln des Canvas
         // In diesem Array wird beim Rendern die Farbe eingetragen
         this.pxTable = [];
@@ -144,15 +209,24 @@ class RainbowSmoke {
         for (let y = 0; y < settings.cSize.y; y++) {
             this.pxTable2D.push([])
             for (let x = 0; x < settings.cSize.x; x++) {
-                let px = {
+                /*let px = {
                     x,
                     y,
                     index: null,
                     distance: helpers.pythagorasPoints({ x, y }, this.startPixel),
                     color: null
-                }
+                }*/
+
+                let px = new Px({
+                    x, y,
+                    distance: helpers.pythagorasPoints({ x, y }, this.startPixel)
+                })
                 // Auf die Distanz einen Wert zählen
-                px.distance += this.additionTable[y][x] * this.additionInflux;
+                if (this.additionInvert) {
+                    px.distance += (1 - this.additionTable[y][x]) * this.additionInflux;
+                } else {
+                    px.distance += this.additionTable[y][x] * this.additionInflux;
+                }
                 // console.log(x, y, px.distance, this.additionTable[y][x] * this.additionInflux);
 
                 this.pxTable.push(px);
@@ -162,6 +236,7 @@ class RainbowSmoke {
     }
 
     sortPxTable() {
+        console.log('sortPxTable');
         // Alles Shufflen, damit die gleich weit entfernte zufällig hintereinander stehen
         for (let i = 0; i < this.pxTable.length; i++) {
             let zIndex = rnd(0, this.pxTable.length);
@@ -183,6 +258,7 @@ class RainbowSmoke {
 
     // Farbtabelle füllen
     fillColorTable() {
+        console.log('fillColorTable');
         let numAllColors = 256 ** 3;
         let numPx = settings.cSize.x * settings.cSize.y;
         let colorInkrement = numAllColors / numPx;
@@ -206,6 +282,7 @@ class RainbowSmoke {
     }
 
     sortColorTable() {
+        console.log('sortColorTable');
         for (let i = 0; i < this.colorTable.length; i++) {
             let zIndex = rnd(0, this.colorTable.length - 1);
             [this.colorTable[i], this.colorTable[zIndex]] = [this.colorTable[zIndex], this.colorTable[i]];
@@ -303,6 +380,7 @@ class RainbowSmoke {
     }
 
     iterate(numIterations = 100) {
+        // console.log('iterate', numIterations);
         for (let i = 0; i < numIterations; i++) {
             this.update()
         }
@@ -328,16 +406,16 @@ class RainbowSmoke {
             if (this.colorTable.length > numIterations) {
                 requestAnimationFrame(() => this.iterate(numIterations));
             } else {
-                if(this.colorTable.length>1){
-                    requestAnimationFrame(() => this.iterate(~~(numIterations/2)));
+                if (this.colorTable.length > 1) {
+                    requestAnimationFrame(() => this.iterate(~~(numIterations / 2)));
                 }
-                console.timeEnd()
+                // console.timeEnd()
             }
         }
     }
 
     // Die umgebenden Pixel nach der Farbe analysieren und den Durchschnittt bilden
-    findEnvColor({ x, y }) {
+    findEnvColor({ x, y } = {}) {
         // console.log(x, y);
         let color = [0, 0, 0];
         let numFoundPx = 0;
