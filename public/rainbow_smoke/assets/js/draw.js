@@ -8,15 +8,18 @@ const draw = {
 
     init() {
         let smoke = new RainbowSmoke({
-            noiseZoom: 2,
-            showNoiseMult : 30,
-            additionInflux: 40,
-            dividerSimilarity : 10000,
-            additionFilename: 'alien2.png',
+            numIterationsAtAll:500,
+            noiseZoom: 5,
+            numBalls:15,
+            showNoiseMult : 0,
+            additionInflux: 50,
+            dividerSimilarity : 20000,
+            additionFilename: 'chricken_highly_detailed_ink_line_drawing_outlines_high_contras_5a53f025-1ef1-4256-85fa-5ad4645cb661.png',
+            colorFilename: 'r1307294_17950605.jpg',
             //'fillAdditionTableSinus','fillAdditionTablePerlin','fillAdditionTableImg',
             // 'fillAdditionTableSinPlane','fillAdditionTableJulia','fillAdditionTableBalls'
-            additionToUse: 'fillAdditionTableBalls',
-            addNoise:.03,
+            additionToUse: 'fillAdditionTableSinPlane',
+            addNoise:0.01,
         });
     }
 }

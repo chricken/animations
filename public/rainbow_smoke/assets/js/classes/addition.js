@@ -55,16 +55,41 @@ const addition = {
                     let val1 = (perlin.noise(x1, y1, z1) + 1) / 2;
                     let val2 = (perlin.noise(x2, y2, z2) + 1) / 2;
                     let val3 = (perlin.noise(x3, y3, z3) + 1) / 2;
-                    let val = ((val1 * 3) + (val2 * 0) + (val3 * 0)) / 3;
+                    let val = ((val1 * 6) + (val2 *0) + (val3 * 0)) / 6;
                     val **= 1 / 3;
 
                     // Add Noise
-                    value += Math.random() * this.addNoise;
+                    val += Math.random() * this.addNoise;
 
                     // Das Array soll mit Zahlen zwischen 0 und 1 gefüllt sein
                     this.additionTable[y].push(val);
                 }
             }
+
+            // Julia in einen Canvas zeichnen
+            const cAddition = document.createElement('canvas');
+            const ctx = cAddition.getContext('2d');
+            cAddition.width = settings.cSize.x;
+            cAddition.height = settings.cSize.y;
+
+            cAddition.style.width = cAddition.width / 2 + 'px';
+            cAddition.style.height = cAddition.height / 2 + 'px';
+
+            document.body.append(cAddition);
+
+            // AdditionTable füllen
+            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+
+            for (let y = 0; y < cAddition.height; y++) {
+                for (let x = 0; x < cAddition.width; x++) {
+                    let index = (y * cAddition.width + x) * 4;
+                    imgData.data[index] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 1] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 2] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 3] = 255
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
 
             resolve();
         })
@@ -78,9 +103,11 @@ const addition = {
 
             const cAddition = document.createElement('canvas');
             const ctx = cAddition.getContext('2d');
-            cAddition.className = 'preview';
             cAddition.width = settings.cSize.x;
             cAddition.height = settings.cSize.y;
+
+            cAddition.style.width = cAddition.width / 2 + 'px';
+            cAddition.style.height = cAddition.height / 2 + 'px';
 
             document.body.append(cAddition);
             console.log('FillAdditionTable');
@@ -169,13 +196,40 @@ const addition = {
                     this.additionTable[y][x] = value;
                 }
             }
+
+            // Julia in einen Canvas zeichnen
+            const cAddition = document.createElement('canvas');
+            const ctx = cAddition.getContext('2d');
+            cAddition.width = settings.cSize.x;
+            cAddition.height = settings.cSize.y;
+
+            cAddition.style.width = cAddition.width / 2 + 'px';
+            cAddition.style.height = cAddition.height / 2 + 'px';
+
+            document.body.append(cAddition);
+
+            // AdditionTable füllen
+            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+
+            for (let y = 0; y < cAddition.height; y++) {
+                for (let x = 0; x < cAddition.width; x++) {
+                    let index = (y * cAddition.width + x) * 4;
+                    imgData.data[index] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 1] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 2] = ~~(this.additionTable[y][x] * 255)
+                    imgData.data[index + 3] = 255
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+
             resolve();
         })
     },
 
     fillAdditionTableBalls() {
         this.additionTable = [];
-        let numBalls = 14;
+        // let numBalls = 14;
 
         // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
         return new Promise((resolve, reject) => {
@@ -186,11 +240,13 @@ const addition = {
             cAddition.width = settings.cSize.x;
             cAddition.height = settings.cSize.y;
 
-            // document.body.append(cAddition);
+            document.body.append(cAddition);
             console.log('FillAdditionTable');
-
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(0, 0, cAddition.width, cAddition.height);
+            ctx.globalCompositeOperation = 'add';
             // Canvas füllen
-            for (let i = 0; i < numBalls; i++) {
+            for (let i = 0; i < this.numBalls; i++) {
                 let x = rnd(0, cAddition.width);
                 let y = rnd(0, cAddition.height);
                 let r = rnd(50, cAddition.height / 3);
@@ -198,8 +254,8 @@ const addition = {
                     x, y, 0,
                     x, y, r
                 );
-                myGradient.addColorStop(0, 'hsla(0,100%,50%,1)')
-                myGradient.addColorStop(1, 'hsla(120,100%,50%,0)')
+                myGradient.addColorStop(0, 'hsl(0,100%,50%,1)')
+                myGradient.addColorStop(1, 'hsl(0,100%,50%,0)')
                 ctx.fillStyle = myGradient;
                 ctx.beginPath()
                 ctx.arc(x, y, r, 0, 2 * Math.PI)

@@ -24,10 +24,10 @@ const init = () => {
     settings.basePath = '../results/img';
     // Sollen die Ergebnisse als Datei gespeichert werden?
     // Dazu muss die Webseite über den eigenen Server geöffnet 
-    settings.saveFile = false;
+    settings.saveFile = true;
     settings.cSize = {
-        x: 600,
-        y: 300,
+        x: ~~(1920 / 2),
+        y: ~~(1040 / 2),
     }
     domMapping();
     fillApp();

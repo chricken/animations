@@ -55,6 +55,7 @@ const tables = {
 
         // Nach Distanz sortieren
         this.pxTable.sort((a, b) => a.distance - b.distance);
+
         for (let i = 0; i < this.pxTable.length; i++) {
             if (this.pxTable[i]) {
                 this.pxTable[i].index = i;
@@ -62,9 +63,50 @@ const tables = {
                 // console.log('index', i);
             }
         }
+
     },
 
     // Farbtabelle füllen
+    fillColorTableImg() {
+
+        this.colorTable = [];
+        console.log('fillColorTable');
+        return new Promise((resolve, reject) => {
+
+            const cColor = document.createElement('canvas');
+            const ctx = cColor.getContext('2d');
+
+            cColor.className = 'preview';
+            cColor.width = settings.cSize.x
+            cColor.height = settings.cSize.y
+
+            cColor.style.width = cColor.width / 2 + 'px';
+            cColor.style.height = cColor.height / 2 + 'px';
+
+            document.body.append(cColor);
+
+            const imgColor = document.createElement('img');
+            imgColor.addEventListener('load', () => {
+                ctx.drawImage(imgColor, 0, 0, cColor.width, cColor.height);
+
+                let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
+
+                for (let y = 0; y < imgData.height; y++) {
+                    // this.colorTable.push([])
+                    for (let x = 0; x < imgData.width; x++) {
+                        let index = (y * imgData.width + x) * 4;
+                        let dt = imgData.data
+                        this.colorTable.push([dt[index],dt[index+1],dt[index+2]])
+                    }
+                }
+                resolve();
+            })
+
+            imgColor.addEventListener('error', reject)
+
+            imgColor.src = this.colorURL;
+        })
+    },
     fillColorTable() {
         console.log('fillColorTable');
         let numAllColors = 256 ** 3;
@@ -85,8 +127,7 @@ const tables = {
             b = parseInt(b, 16);
             this.colorTable.push([r, g, b]);
         }
-        // console.log(this.colorTable);
-
+        
     },
 
     sortColorTable() {
