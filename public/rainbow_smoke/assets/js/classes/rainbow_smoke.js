@@ -86,13 +86,21 @@ class RainbowSmoke {
 
         // Addition hinzufügen.
         // Da hier ggf mit Dateien gearbeitet wird, sind es grundsätzlich Promises 
-        this[additionToUse]().then(
+        console.log();
+        this[settings.additionToUse]().then(
             this.fillPxTable
         ).then(
             this.sortPxTable
         ).then(
-            this.fillColorTable
-            // this.fillColorTableImg
+            this.drawAdditionTable
+        ).then(
+            () => {
+                if (settings.colorFileContent) {
+                    this.fillColorTableImg()
+                } else {
+                    this.fillColorTable()
+                }
+            }
         ).then(
             this.sortColorTable
         ).then(

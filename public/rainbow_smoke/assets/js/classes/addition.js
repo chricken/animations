@@ -6,6 +6,21 @@ import helpers, { rnd, lead0 } from '../../../../modules/helpers.js';
 import noises, { Perlin } from '../../../../modules/noises.js';
 
 const addition = {
+    // Dies ist ein Dummy, der die Addition mit Nullen füllt
+    fillAdditionTableNone() {
+        this.additionTable = [];
+
+        return new Promise((resolve, reject) => {
+            for (let y = 0; y < settings.cSize.y; y++) {
+                this.additionTable.push([]);
+                for (let x = 0; x < settings.cSize.x; x++) {
+                    this.additionTable[y].push(0);
+                }
+            }
+            resolve();
+        })
+    },
+
     // Ein Table mit zusätzlichen Werten, die auf die Distance gerechnet und 
     // damit den Aufbau etwas interessanter gestalten sollen
     fillAdditionTableSinus() {
@@ -55,7 +70,7 @@ const addition = {
                     let val1 = (perlin.noise(x1, y1, z1) + 1) / 2;
                     let val2 = (perlin.noise(x2, y2, z2) + 1) / 2;
                     let val3 = (perlin.noise(x3, y3, z3) + 1) / 2;
-                    let val = ((val1 * 6) + (val2 *0) + (val3 * 0)) / 6;
+                    let val = ((val1 * 6) + (val2 * 0) + (val3 * 0)) / 6;
                     val **= 1 / 3;
 
                     // Add Noise
@@ -75,7 +90,7 @@ const addition = {
             cAddition.style.width = cAddition.width / 2 + 'px';
             cAddition.style.height = cAddition.height / 2 + 'px';
 
-            document.body.append(cAddition);
+            // document.body.append(cAddition);
 
             // AdditionTable füllen
             const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
@@ -109,36 +124,45 @@ const addition = {
             cAddition.style.width = cAddition.width / 2 + 'px';
             cAddition.style.height = cAddition.height / 2 + 'px';
 
-            document.body.append(cAddition);
+            // document.body.append(cAddition);
             console.log('FillAdditionTable');
 
             // Bild laden
-            const imgAddition = document.createElement('img');
-            imgAddition.addEventListener('load', () => {
-                ctx.drawImage(imgAddition, 0, 0, cAddition.width, cAddition.height);
+            // const imgAddition = document.createElement('img');
+            // imgAddition.addEventListener('load', () => {
+            // ctx.drawImage(imgAddition, 0, 0, cAddition.width, cAddition.height);
 
-                // AdditionTable füllen
-                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+            ctx.drawImage(
+                settings.additionFileContent,
+                0,
+                0,
+                cAddition.width,
+                cAddition.height
+            );
 
-                for (let y = 0; y < cAddition.height; y++) {
-                    this.additionTable.push([])
-                    for (let x = 0; x < cAddition.width; x++) {
-                        let index = (y * cAddition.width + x) * 4;
-                        let idt = imgData.data;
-                        let value = (idt[index] + idt[index + 1] + idt[index + 2])
-                        value /= 3;
-                        value /= 255
 
-                        // Add Noise
-                        value += Math.random() * this.addNoise;
+            // AdditionTable füllen
+            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
 
-                        this.additionTable[y].push([value]);
-                    }
+            for (let y = 0; y < cAddition.height; y++) {
+                this.additionTable.push([])
+                for (let x = 0; x < cAddition.width; x++) {
+                    let index = (y * cAddition.width + x) * 4;
+                    let idt = imgData.data;
+                    let value = (idt[index] + idt[index + 1] + idt[index + 2])
+                    value /= 3;
+                    value /= 255
+
+                    // Add Noise
+                    value += Math.random() * this.addNoise;
+
+                    this.additionTable[y].push([value]);
                 }
+            }
 
-                resolve();
-            })
-            imgAddition.src = this.additionURL;
+            resolve();
+            // })
+            // imgAddition.src = this.additionURL;
         })
     },
 
@@ -206,7 +230,7 @@ const addition = {
             cAddition.style.width = cAddition.width / 2 + 'px';
             cAddition.style.height = cAddition.height / 2 + 'px';
 
-            document.body.append(cAddition);
+            // document.body.append(cAddition);
 
             // AdditionTable füllen
             const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
@@ -240,7 +264,7 @@ const addition = {
             cAddition.width = settings.cSize.x;
             cAddition.height = settings.cSize.y;
 
-            document.body.append(cAddition);
+            // document.body.append(cAddition);
             console.log('FillAdditionTable');
             ctx.fillStyle = '#0f0';
             ctx.fillRect(0, 0, cAddition.width, cAddition.height);
@@ -282,6 +306,30 @@ const addition = {
             resolve();
         })
     },
+
+    drawAdditionTable() {
+        console.log('Draw Addition Table');
+        elements.containerPreview.innerHTML = '';
+        const cAddition = document.createElement('canvas');
+        elements.containerPreview.append(cAddition)
+        const ctx = cAddition.getContext('2d');
+        cAddition.width = settings.cSize.x;
+        cAddition.height = settings.cSize.y;
+        cAddition.className = 'preview';
+        const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+
+        for (let y = 0; y < cAddition.height; y++) {
+            for (let x = 0; x < cAddition.width; x++) {
+                let index = (y * cAddition.width + x) * 4;
+                imgData.data[index] = ~~(this.additionTable[y][x] * 255)
+                imgData.data[index + 1] = ~~(this.additionTable[y][x] * 255)
+                imgData.data[index + 2] = ~~(this.additionTable[y][x] * 255)
+                imgData.data[index + 3] = 255
+            }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+    }
 
 }
 

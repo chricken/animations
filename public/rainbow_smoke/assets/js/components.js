@@ -7,14 +7,6 @@ const components = {
     commonSettings(parent) {
         console.log(parent);
 
-        /*
-        saveFile: false,
-        // Größe des zu rendernden Bildes
-        cSize: {
-            x: ~~(1920 / 40),
-            y: ~~(1040 / 40),
-        },
-        */
         // Canvas Size
         components.range({
             parent,
@@ -65,28 +57,29 @@ const components = {
         if (checked) cb.checked = true;
     },
 
-    inputFile({parent, legend, callback}){
+    inputFile({ parent, legend, callback }) {
         const container = create({
-            type:'div',
+            type: 'div',
             parent
         })
 
-        create( {
-            type:'span',
+        create({
+            type: 'span',
             content: legend,
             parent: container,
         })
 
-        create({
-            type:'input',
-            attr:{
-                type:'file',
+        const elInput = create({
+            type: 'input',
+            attr: {
+                type: 'file',
             },
             parent: container,
-            listeners:{
-                click: callback
+            listeners: {
+                change: callback
             }
         })
+        return [elInput, container]
     },
 
     range({ parent, legend, callback, min, max, value }) {

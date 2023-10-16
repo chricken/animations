@@ -29,50 +29,99 @@ const fillApp = () => {
     })
 
     // Colortable Image
-    components.inputFile({
-        parent:containerUI,
-        legend: 'Image Colortable',
-        callback(){
+    const [inputFile] = components.inputFile({
+        parent: containerUI,
+        legend: 'Image for Colortable',
+        callback() {
+            const file = inputFile.files[0];
+            const reader = new FileReader();
 
+            reader.addEventListener('load', event => {
+                settings.colorFileContent = new Image();
+                settings.colorFileContent.addEventListener('load', () => {
+                    // console.log(settings.colorFileContent);
+                });
+                settings.colorFileContent.src = event.target.result;
+            })
+            // Filereader aufrufen
+            reader.readAsDataURL(file);
         }
     })
-   
+
+    // Addition Image
+    const [inputAdditionFile] = components.inputFile({
+        parent: containerUI,
+        legend: 'Image for Additiontable',
+        callback() {
+            console.log(inputAdditionFile.files[0]);
+
+            const file = inputAdditionFile.files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener('load', event => {
+                // console.log('Reader', event);
+                settings.additionFileContent = new Image();
+                settings.additionFileContent.addEventListener('load', () => {
+                    // console.log(settings.additionFileContent);
+                });
+                settings.additionFileContent.src = event.target.result;
+            })
+            // Filereader aufrufen
+            reader.readAsDataURL(file);
+        }
+    })
+
 
     // Allgemeine Settings
-    /*
     components.commonSettings(containerUI)
-    
-    // Addition Auswahlfeld
-    const elAuswahl = create({
-        type:'select',
-        parent: containerUI,
-        listeners:{
-            change(){
-                console.log(alAuswahl.value);
 
+    // Addition Auswahlfeld
+    const containerSelect = create({
+        parent: containerUI
+    })
+
+    create({
+        type:'span',
+        content: 'Addition to use',
+        parent: containerSelect
+    })
+
+    const elAuswahl = create({
+        type: 'select',
+        parent: containerSelect,
+        attr:{
+            value:settings.additionToUse
+        },
+        listeners: {
+            change() {
+                console.log(elAuswahl.value);
+                settings.additionToUse = elAuswahl.value;
             }
         }
     })
     create({
-        type:'option',
-        parent:elAuswahl,
+        type: 'option',
+        parent: elAuswahl,
         content: 'Bitte wählen',
-        attr:{
+        attr: {
             value: 'none'
         }
     })
 
     settings.additionsAvailable.forEach(addition => {
         create({
-            type:'option',
-            parent:elAuswahl,
-            content: addition,
-            attr:{
-                value: addition
+            type: 'option',
+            parent: elAuswahl,
+            content: addition.text,
+            attr: {
+                value: addition.value
             }
         })
     })
 
+    elAuswahl.value = settings.additionToUse;
+
+    /*
     // Container für die Einstellungen
     const containerAdditionSettings = create({
         parent: containerUI,
@@ -83,25 +132,31 @@ const fillApp = () => {
 
     // Button zum Rendern
     create({
-        type:'button',
-        parent:containerUI,
+        type: 'button',
+        parent: containerUI,
         content: 'Render',
-        listeners:{
-            click(){
+        listeners: {
+            click() {
                 settings.cancel = false;
                 draw.init();
             }
         }
     })
     create({
-        type:'button',
-        parent:containerUI,
+        type: 'button',
+        parent: containerUI,
         content: 'Cancel',
-        listeners:{
-            click(){
+        listeners: {
+            click() {
                 settings.cancel = true;
             }
         }
+    })
+
+    // Container for Previews
+    elements.containerPreview = create({
+        parent: containerUI,
+        classes:['container', 'preview']
     })
 }
 
@@ -117,7 +172,7 @@ const init = () => {
             x: ~~(1920 / 4),
             y: ~~(1040 / 4),
         },
-        additionInflux: 10,
+        additionInflux: 4,
         additionInvert: true,
         showNoiseMult: 100,
         noiseZoom: 60,
@@ -125,17 +180,18 @@ const init = () => {
         additionFilename: 'Apophysis-2.png',
         colorFilename: '041002_174545.jpg',
         numIterationsAtAll: 10,
-        additionToUse: 'fillAdditionTableImg',
+        additionToUse: 'fillAdditionTableNone',
         addNoise: 0,
         numBalls: 15,
         numSeeds: 3,
         additionsAvailable: [
-            'fillAdditionTableSinus',
-            'fillAdditionTablePerlin',
-            'fillAdditionTableImg',
-            'fillAdditionTableSinPlane',
-            'fillAdditionTableJulia',
-            'fillAdditionTableBalls'
+            { text: 'None', value: 'fillAdditionTableNone' },
+            { text: 'Sinus', value: 'fillAdditionTableSinus' },
+            { text: 'Perlin', value: 'fillAdditionTablePerlin' },
+            { text: 'Image', value: 'fillAdditionTableImg' },
+            { text: 'Sinus Plane', value: 'fillAdditionTableSinPlane' },
+            { text: 'Julia', value: 'fillAdditionTableJulia' },
+            { text: 'Balls', value: 'fillAdditionTableBalls' }
         ]
     })
     domMapping();

@@ -102,31 +102,41 @@ const tables = {
             cColor.width = settings.cSize.x
             cColor.height = settings.cSize.y
 
-            cColor.style.width = cColor.width / 2 + 'px';
-            cColor.style.height = cColor.height / 2 + 'px';
+            // cColor.style.width = cColor.width / 2 + 'px';
+            // cColor.style.height = cColor.height / 2 + 'px';
 
-            document.body.append(cColor);
+            elements.containerPreview.append(cColor);
 
-            const imgColor = document.createElement('img');
-            imgColor.addEventListener('load', () => {
-                ctx.drawImage(imgColor, 0, 0, cColor.width, cColor.height);
+            // const imgColor = document.createElement('img');
+            // imgColor.addEventListener('load', () => {
+            // ctx.drawImage(imgColor, 0, 0, cColor.width, cColor.height);
 
-                let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
+            ctx.drawImage(
+                settings.colorFileContent,
+                0,
+                0,
+                cColor.width,
+                cColor.height
+            );
 
-                for (let y = 0; y < imgData.height; y++) {
-                    // this.colorTable.push([])
-                    for (let x = 0; x < imgData.width; x++) {
-                        let index = (y * imgData.width + x) * 4;
-                        let dt = imgData.data
-                        this.colorTable.push([dt[index], dt[index + 1], dt[index + 2]])
-                    }
+            let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
+
+            for (let y = 0; y < imgData.height; y++) {
+                // this.colorTable.push([])
+                for (let x = 0; x < imgData.width; x++) {
+                    let index = (y * imgData.width + x) * 4;
+                    let dt = imgData.data
+                    this.colorTable.push([dt[index], dt[index + 1], dt[index + 2]])
                 }
-                resolve();
-            })
+            }
 
-            imgColor.addEventListener('error', reject)
+            resolve();
 
-            imgColor.src = this.colorURL;
+            // })
+
+            // imgColor.addEventListener('error', reject)
+
+            // imgColor.src = this.colorURL;
         })
     },
     fillColorTable() {
@@ -149,6 +159,31 @@ const tables = {
             b = parseInt(b, 16);
             this.colorTable.push([r, g, b]);
         }
+
+        // Draw Colortable
+        const cColor = document.createElement('canvas');
+        const ctx = cColor.getContext('2d');
+
+        cColor.className = 'preview';
+        cColor.width = settings.cSize.x
+        cColor.height = settings.cSize.y
+
+        elements.containerPreview.append(cColor);
+
+        let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
+
+        for (let y = 0; y < imgData.height; y++) {
+            // this.colorTable.push([])
+            for (let x = 0; x < imgData.width; x++) {
+                let index = (y * imgData.width + x) * 4;
+                // console.log(index, this.colorTable[index / 4]);
+                imgData.data[index] = this.colorTable[index / 4][0];
+                imgData.data[index + 1] = this.colorTable[index / 4][1];
+                imgData.data[index + 2] = this.colorTable[index / 4][2];
+                imgData.data[index + 3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
 
     },
 
