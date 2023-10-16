@@ -20,13 +20,10 @@ class RainbowSmoke {
         additionFilename = 'Apophysis-2.png',
         colorFilename = '041002_174545.jpg',
         numIterationsAtAll = 300,
-        startPixel = {
-            x: rnd(0, settings.cSize.x),
-            y: rnd(0, settings.cSize.y),
-        },
         additionToUse = 'fillAdditionTableImg',
         addNoise = 0,
         numBalls = 15,
+        numSeeds = 3
     } = {}) {
 
         // Anzahl der Iterationen pro Update
@@ -78,9 +75,14 @@ class RainbowSmoke {
         })
 
         // StartPixel auf einen zufälligen Wert setzen
-        this.startPixel = startPixel;
+        this.startSeeds = [...new Array(numSeeds)].map(() => {
+            return {
+                x: rnd(0, settings.cSize.x - 1),
+                y: rnd(0, settings.cSize.y - 1),
+            };
+        })
 
-        console.log(this.startPixel.x, this.startPixel.y);
+        //  console.log(this.startSeeds);
 
         // Addition hinzufügen.
         // Da hier ggf mit Dateien gearbeitet wird, sind es grundsätzlich Promises 
@@ -95,11 +97,13 @@ class RainbowSmoke {
             this.sortColorTable
         ).then(
             () => {
-                this.pxTable2D[this.startPixel.y][this.startPixel.x].color = [
-                    rnd(0, 255),
-                    rnd(0, 255),
-                    rnd(0, 255),
-                ];
+                this.startSeeds.forEach(seed => {
+                    this.pxTable2D[seed.y][seed.x].color = [
+                        rnd(0, 255),
+                        rnd(0, 255),
+                        rnd(0, 255),
+                    ];
+                })
 
                 // console.log('startColor', this.pxTable2D[this.startPixel.y][this.startPixel.x]);
                 console.log('Start Update and Render');
@@ -223,24 +227,25 @@ class RainbowSmoke {
                 () => {
                     fileNo++;
                     // this.animate()
-                    if (this.colorTable.length > numIterations + 1) {
+                    console.log(settings.cancel);
+                    if (this.colorTable.length > numIterations + 1 && !settings.cancel) {
                         requestAnimationFrame(() => this.iterate(numIterations));
                     } else {
-
-                        console.timeEnd()
+                        if (this.colorTable.length > 1 && !settings.cancel) {
+                            requestAnimationFrame(() => this.iterate(~~(numIterations / 2)));
+                        }
                     }
                 }
             ).catch(
                 console.warn
             )
         } else {
-            if (this.colorTable.length > numIterations) {
+            if (this.colorTable.length > numIterations && !settings.cancel) {
                 requestAnimationFrame(() => this.iterate(numIterations));
             } else {
-                if (this.colorTable.length > 1) {
+                if (this.colorTable.length > 1 && !settings.cancel) {
                     requestAnimationFrame(() => this.iterate(~~(numIterations / 2)));
                 }
-                // console.timeEnd()
             }
         }
     }

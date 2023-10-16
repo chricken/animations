@@ -27,10 +27,32 @@ const tables = {
         for (let y = 0; y < settings.cSize.y; y++) {
             this.pxTable2D.push([])
             for (let x = 0; x < settings.cSize.x; x++) {
+
+                // Den dichtesten Startpunkt finden
+                const nearestStartSeed = this.startSeeds.reduce(
+                    (nearest, seed) => {
+                        let distance = helpers.pythagorasPoints({ x, y }, seed)
+                        if (distance < nearest.distance && distance > 0) {
+                            return seed;
+                        } else {
+                            return nearest;
+                        }
+                    },
+                    new Px({
+                        x, y,
+                        distance: Infinity
+                    })
+                )
+
+                // Abstand vom aktuellen Punkt zum dichtesten Startseed ermitteln
+                // console.log(x, y, nearestStartSeed);
+                // let px = nearestStartSeed;
                 let px = new Px({
                     x, y,
-                    distance: helpers.pythagorasPoints({ x, y }, this.startPixel)
+                    distance: helpers.pythagorasPoints({ x, y }, { x: nearestStartSeed.x, y: nearestStartSeed.y })
                 })
+                // console.log(px);
+                // console.log(' ');
                 // Auf die Distanz einen Wert zählen
                 if (this.additionInvert) {
                     px.distance += (1 - this.additionTable[y][x]) * this.additionInflux;
@@ -96,7 +118,7 @@ const tables = {
                     for (let x = 0; x < imgData.width; x++) {
                         let index = (y * imgData.width + x) * 4;
                         let dt = imgData.data
-                        this.colorTable.push([dt[index],dt[index+1],dt[index+2]])
+                        this.colorTable.push([dt[index], dt[index + 1], dt[index + 2]])
                     }
                 }
                 resolve();
@@ -127,7 +149,7 @@ const tables = {
             b = parseInt(b, 16);
             this.colorTable.push([r, g, b]);
         }
-        
+
     },
 
     sortColorTable() {
