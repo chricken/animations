@@ -9,7 +9,10 @@ canvas {
     height: auto;
     /* background-color: #000; */
 }
-
+.preview {
+    max-height:120px;
+    width: auto;
+}
 .container {
     position: relative;
     display: block;

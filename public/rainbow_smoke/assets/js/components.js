@@ -82,8 +82,46 @@ const components = {
         return [elInput, container]
     },
 
-    range({ parent, legend, callback, min, max, value }) {
+    range({ parent, legend, callback, min, max, step,value }) {
         const container = create({
+            parent,
+            classes: ['container'],
+        })
+
+        // Beschriftung
+        create({
+            type: 'span',
+            content: legend
+        })
+
+        // Range
+        let inputRange = create({
+            type: 'input',
+            attr: {
+                type: 'range',
+                value, min, max, step,
+            },
+            parent: container,
+            listeners: {
+                input(evt) {
+                    inputText.value = inputRange.value;
+                    callback(evt);
+                }
+            }
+        })
+
+        let inputText = create({
+            type: 'input',
+            parent: container,
+            attr: {
+                value
+            },
+            listeners: {
+                input(evt) {
+                    inputRange.value = inputText.value;
+                    callback(evt)
+                }
+            }
 
         })
     }

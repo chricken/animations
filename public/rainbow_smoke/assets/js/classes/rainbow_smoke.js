@@ -27,7 +27,7 @@ class RainbowSmoke {
     } = {}) {
 
         // Anzahl der Iterationen pro Update
-        const numIterationsPerUpdate = ~~((settings.cSize.x * settings.cSize.y) / numIterationsAtAll)
+        const numIterationsPerUpdate = ~~((settings.cSize.x * settings.cSize.y) / settings.numIterationsAtAll)
         console.log('numIterationsPerUpdate', numIterationsPerUpdate);
 
         // Einfluss des Additiontables auf die Farbverteilung
@@ -44,7 +44,8 @@ class RainbowSmoke {
         this.noiseZoom = noiseZoom;
 
         // Zusätzliches Rauschen für die Addition
-        this.addNoise = addNoise;
+        this.addNoise = settings.addNoise;
+        console.log(this.addNoise);
 
         // Divider, der das Finden ähnlich-farbiger Pixel beschleunigt 
         // auf Kosten der Qualität
@@ -75,7 +76,7 @@ class RainbowSmoke {
         })
 
         // StartPixel auf einen zufälligen Wert setzen
-        this.startSeeds = [...new Array(numSeeds)].map(() => {
+        this.startSeeds = [...new Array(settings.numSeeds)].map(() => {
             return {
                 x: rnd(0, settings.cSize.x - 1),
                 y: rnd(0, settings.cSize.y - 1),
@@ -130,7 +131,7 @@ class RainbowSmoke {
         let nextPx = this.findNextPixel();
         let envColor = this.findEnvColor(nextPx);
         let nextColor = this.findNearestColor(envColor);
-        if (nextColor)
+        if (nextColor && nextPx)
             nextPx.color = nextColor.color.color;
     }
 

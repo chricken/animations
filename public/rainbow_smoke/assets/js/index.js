@@ -73,7 +73,7 @@ const fillApp = () => {
 
 
     // Allgemeine Settings
-    components.commonSettings(containerUI)
+    // components.commonSettings(containerUI)
 
     // Addition Auswahlfeld
     const containerSelect = create({
@@ -119,6 +119,32 @@ const fillApp = () => {
         })
     })
 
+    // Noise einstellen
+    components.range({
+        parent:containerUI,
+        legend: 'Add Noise',
+        min:0,
+        max:10,
+        step:.1,
+        value: settings.addNoise,
+        callback(evt){
+            settings.addNoise = +evt.target.value;
+        }
+    })
+    elAuswahl.value = settings.additionToUse;
+
+    // Anzahl der Seeds einstellen
+    components.range({
+        parent:containerUI,
+        legend: 'Num Seeds',
+        min:0,
+        max:20,
+        step:1,
+        value: settings.numSeeds,
+        callback(evt){
+            settings.numSeeds = +evt.target.value;
+        }
+    })
     elAuswahl.value = settings.additionToUse;
 
     /*
@@ -169,17 +195,17 @@ const init = () => {
         saveFile: false,
         // Größe des zu rendernden Bildes
         cSize: {
-            x: ~~(1920 / 4),
-            y: ~~(1040 / 4),
+            x: ~~(1920 / 3),
+            y: ~~(1040 / 3),
         },
         additionInflux: 4,
         additionInvert: true,
         showNoiseMult: 100,
         noiseZoom: 60,
         dividerSimilarity: 1000,
-        additionFilename: 'Apophysis-2.png',
-        colorFilename: '041002_174545.jpg',
-        numIterationsAtAll: 10,
+        additionFilename: false,
+        colorFilename: false,
+        numIterationsAtAll: ~~((600*300)/300),
         additionToUse: 'fillAdditionTableNone',
         addNoise: 0,
         numBalls: 15,

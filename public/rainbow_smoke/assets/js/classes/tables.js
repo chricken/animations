@@ -24,6 +24,8 @@ const tables = {
         // Zusätzliches 2D-Array, um die umgebungsfarben effizient lesen zu können
         this.pxTable2D = []
 
+        console.log(this.startSeeds);
+
         for (let y = 0; y < settings.cSize.y; y++) {
             this.pxTable2D.push([])
             for (let x = 0; x < settings.cSize.x; x++) {
@@ -31,9 +33,18 @@ const tables = {
                 // Den dichtesten Startpunkt finden
                 const nearestStartSeed = this.startSeeds.reduce(
                     (nearest, seed) => {
+                        // Abstand berechnen
                         let distance = helpers.pythagorasPoints({ x, y }, seed)
+
+                        // Noise hinzufügen
+                        distance += rnd(0, settings.addNoise * 100) / 100;
+
                         if (distance < nearest.distance && distance > 0) {
-                            return seed;
+                            return {
+                                x: seed.x,
+                                y: seed.y,
+                                distance
+                            };
                         } else {
                             return nearest;
                         }
@@ -51,6 +62,8 @@ const tables = {
                     x, y,
                     distance: helpers.pythagorasPoints({ x, y }, { x: nearestStartSeed.x, y: nearestStartSeed.y })
                 })
+
+                px.distance += rnd(0, settings.addNoise * 100) / 100;
                 // console.log(px);
                 // console.log(' ');
                 // Auf die Distanz einen Wert zählen
@@ -139,6 +152,7 @@ const tables = {
             // imgColor.src = this.colorURL;
         })
     },
+
     fillColorTable() {
         console.log('fillColorTable');
         let numAllColors = 256 ** 3;
