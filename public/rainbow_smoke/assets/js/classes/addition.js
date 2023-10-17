@@ -128,197 +128,197 @@ const addition = {
             console.log('FillAdditionTable');
 
             // Bild laden
-            // const imgAddition = document.createElement('img');
-            // imgAddition.addEventListener('load', () => {
-            // ctx.drawImage(imgAddition, 0, 0, cAddition.width, cAddition.height);
+            const imgAddition = document.createElement('img');
+            imgAddition.addEventListener('load', () => {
+                ctx.drawImage(imgAddition, 0, 0, cAddition.width, cAddition.height);
+                /*
+                            ctx.drawImage(
+                                settings.additionFileContent,
+                                0,
+                                0,
+                                cAddition.width,
+                                cAddition.height
+                            );
+                */
 
-            ctx.drawImage(
-                settings.additionFileContent,
-                0,
-                0,
-                cAddition.width,
-                cAddition.height
-            );
+                // AdditionTable füllen
+                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
 
+                for (let y = 0; y < cAddition.height; y++) {
+                    this.additionTable.push([])
+                    for (let x = 0; x < cAddition.width; x++) {
+                        let index = (y * cAddition.width + x) * 4;
+                        let idt = imgData.data;
+                        let value = (idt[index] + idt[index + 1] + idt[index + 2])
+                        value /= 3;
+                        value /= 255
 
-            // AdditionTable füllen
-            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+                        // Add Noise
+                        value += Math.random() * this.addNoise;
 
-            for (let y = 0; y < cAddition.height; y++) {
-                this.additionTable.push([])
-                for (let x = 0; x < cAddition.width; x++) {
-                    let index = (y * cAddition.width + x) * 4;
-                    let idt = imgData.data;
-                    let value = (idt[index] + idt[index + 1] + idt[index + 2])
-                    value /= 3;
-                    value /= 255
-
-                    // Add Noise
-                    value += Math.random() * this.addNoise;
-
-                    this.additionTable[y].push([value]);
+                        this.additionTable[y].push([value]);
+                    }
                 }
-            }
 
-            resolve();
-            // })
-            // imgAddition.src = this.additionURL;
-        })
-    },
+                resolve();
+                })
+                imgAddition.src = this.additionURL;
+            })
+        },
 
-    fillAdditionTableSinPlane() {
-        this.additionTable = [];
+            fillAdditionTableSinPlane() {
+            this.additionTable = [];
 
-        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
-        return new Promise((resolve, reject) => {
+            // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+            return new Promise((resolve, reject) => {
 
-            for (let y = 0; y < settings.cSize.y; y++) {
-                this.additionTable.push([])
-                for (let x = 0; x < settings.cSize.x; x++) {
-                    let a = x / 180 * Math.PI;
-                    let b = y / 180 * Math.PI;
-                    a *= this.noiseZoom;
-                    b *= this.noiseZoom;
-                    let value = (Math.cos(a) + Math.sin(b)) / 2;
-                    value = (value + 1) / 2;
-                    value += Math.random() * this.addNoise;
+                for (let y = 0; y < settings.cSize.y; y++) {
+                    this.additionTable.push([])
+                    for (let x = 0; x < settings.cSize.x; x++) {
+                        let a = x / 180 * Math.PI;
+                        let b = y / 180 * Math.PI;
+                        a *= this.noiseZoom;
+                        b *= this.noiseZoom;
+                        let value = (Math.cos(a) + Math.sin(b)) / 2;
+                        value = (value + 1) / 2;
+                        value += Math.random() * this.addNoise;
 
-                    this.additionTable[y][x] = value;
+                        this.additionTable[y][x] = value;
+                    }
                 }
-            }
-            resolve();
-        })
-    },
+                resolve();
+            })
+        },
 
-    fillAdditionTableJulia() {
-        this.additionTable = [];
-        // let realPart = -0.7, imagPart = 0.27015, maxIterations = 100;
-        let realPart = rnd(-200, -10) / 100,
+            fillAdditionTableJulia() {
+            this.additionTable = [];
+            // let realPart = -0.7, imagPart = 0.27015, maxIterations = 100;
+            let realPart = rnd(-200, -10) / 100,
             imagPart = rnd(0, 100) / 100,
             maxIterations = 100,
             camX = rnd(-100, 100) / 100,
             camY = rnd(-100, 100) / 100,
             zoom = rnd(50, 500) / 100;
 
-        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
-        return new Promise((resolve, reject) => {
-            for (let y = 0; y < settings.cSize.y; y++) {
-                this.additionTable.push([])
-                for (let x = 0; x < settings.cSize.x; x++) {
+            // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+            return new Promise((resolve, reject) => {
+                for (let y = 0; y < settings.cSize.y; y++) {
+                    this.additionTable.push([])
+                    for (let x = 0; x < settings.cSize.x; x++) {
 
-                    let zx = 1.5 * (x - settings.cSize.x / 2) / (0.5 * settings.cSize.x) / zoom + camX;
-                    let zy = (y - settings.cSize.y / 2) / (0.5 * settings.cSize.y) / zoom + camY;
-                    let i;
+                        let zx = 1.5 * (x - settings.cSize.x / 2) / (0.5 * settings.cSize.x) / zoom + camX;
+                        let zy = (y - settings.cSize.y / 2) / (0.5 * settings.cSize.y) / zoom + camY;
+                        let i;
 
-                    for (i = maxIterations; zx * zx + zy * zy < 4 && i > 0; i--) {
-                        const xtemp = zx * zx - zy * zy + realPart;
-                        zy = 2 * zx * zy + imagPart;
-                        zx = xtemp;
+                        for (i = maxIterations; zx * zx + zy * zy < 4 && i > 0; i--) {
+                            const xtemp = zx * zx - zy * zy + realPart;
+                            zy = 2 * zx * zy + imagPart;
+                            zx = xtemp;
+                        }
+                        let value = (i === 0) ? 0 : 1 - i / maxIterations;
+                        value **= 1 / 2
+                        this.additionTable[y][x] = value;
                     }
-                    let value = (i === 0) ? 0 : 1 - i / maxIterations;
-                    value **= 1 / 2
-                    this.additionTable[y][x] = value;
                 }
-            }
 
-            // Julia in einen Canvas zeichnen
-            const cAddition = document.createElement('canvas');
-            const ctx = cAddition.getContext('2d');
-            cAddition.width = settings.cSize.x;
-            cAddition.height = settings.cSize.y;
+                // Julia in einen Canvas zeichnen
+                const cAddition = document.createElement('canvas');
+                const ctx = cAddition.getContext('2d');
+                cAddition.width = settings.cSize.x;
+                cAddition.height = settings.cSize.y;
 
-            cAddition.style.width = cAddition.width / 2 + 'px';
-            cAddition.style.height = cAddition.height / 2 + 'px';
+                cAddition.style.width = cAddition.width / 2 + 'px';
+                cAddition.style.height = cAddition.height / 2 + 'px';
 
-            // document.body.append(cAddition);
+                // document.body.append(cAddition);
 
-            // AdditionTable füllen
-            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+                // AdditionTable füllen
+                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
 
-            for (let y = 0; y < cAddition.height; y++) {
-                for (let x = 0; x < cAddition.width; x++) {
-                    let index = (y * cAddition.width + x) * 4;
-                    imgData.data[index] = ~~(this.additionTable[y][x] * 255)
-                    imgData.data[index + 1] = ~~(this.additionTable[y][x] * 255)
-                    imgData.data[index + 2] = ~~(this.additionTable[y][x] * 255)
-                    imgData.data[index + 3] = 255
+                for (let y = 0; y < cAddition.height; y++) {
+                    for (let x = 0; x < cAddition.width; x++) {
+                        let index = (y * cAddition.width + x) * 4;
+                        imgData.data[index] = ~~(this.additionTable[y][x] * 255)
+                        imgData.data[index + 1] = ~~(this.additionTable[y][x] * 255)
+                        imgData.data[index + 2] = ~~(this.additionTable[y][x] * 255)
+                        imgData.data[index + 3] = 255
+                    }
                 }
-            }
-            ctx.putImageData(imgData, 0, 0);
+                ctx.putImageData(imgData, 0, 0);
 
 
-            resolve();
-        })
-    },
+                resolve();
+            })
+        },
 
-    fillAdditionTableBalls() {
-        this.additionTable = [];
-        // let numBalls = 14;
+            fillAdditionTableBalls() {
+            this.additionTable = [];
+            // let numBalls = 14;
 
-        // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
-        return new Promise((resolve, reject) => {
+            // AdditionTables sollen grundsätzlich in einem Promise ausgeführt werden, damit man nicht immer umbauen muss, wenn Bilder benutzt werden
+            return new Promise((resolve, reject) => {
 
-            const cAddition = document.createElement('canvas');
-            const ctx = cAddition.getContext('2d');
-            cAddition.className = 'preview';
-            cAddition.width = settings.cSize.x;
-            cAddition.height = settings.cSize.y;
+                const cAddition = document.createElement('canvas');
+                const ctx = cAddition.getContext('2d');
+                cAddition.className = 'preview';
+                cAddition.width = settings.cSize.x;
+                cAddition.height = settings.cSize.y;
 
-            // document.body.append(cAddition);
-            console.log('FillAdditionTable');
-            ctx.fillStyle = '#0f0';
-            ctx.fillRect(0, 0, cAddition.width, cAddition.height);
-            ctx.globalCompositeOperation = 'add';
-            // Canvas füllen
-            for (let i = 0; i < this.numBalls; i++) {
-                let x = rnd(0, cAddition.width);
-                let y = rnd(0, cAddition.height);
-                let r = rnd(50, cAddition.height / 3);
-                let myGradient = ctx.createRadialGradient(
-                    x, y, 0,
-                    x, y, r
-                );
-                myGradient.addColorStop(0, 'hsl(0,100%,50%,1)')
-                myGradient.addColorStop(1, 'hsl(0,100%,50%,0)')
-                ctx.fillStyle = myGradient;
-                ctx.beginPath()
-                ctx.arc(x, y, r, 0, 2 * Math.PI)
-                ctx.fill();
-            }
-
-            // AdditionTable füllen
-            const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
-
-            for (let y = 0; y < cAddition.height; y++) {
-                this.additionTable.push([])
-                for (let x = 0; x < cAddition.width; x++) {
-                    let index = (y * cAddition.width + x) * 4;
-                    let idt = imgData.data;
-                    let value = idt[index] / 255;
-
-                    // Add Noise
-                    value += Math.random() * this.addNoise;
-
-                    this.additionTable[y].push([value]);
+                // document.body.append(cAddition);
+                console.log('FillAdditionTable');
+                ctx.fillStyle = '#0f0';
+                ctx.fillRect(0, 0, cAddition.width, cAddition.height);
+                ctx.globalCompositeOperation = 'add';
+                // Canvas füllen
+                for (let i = 0; i < this.numBalls; i++) {
+                    let x = rnd(0, cAddition.width);
+                    let y = rnd(0, cAddition.height);
+                    let r = rnd(50, cAddition.height / 3);
+                    let myGradient = ctx.createRadialGradient(
+                        x, y, 0,
+                        x, y, r
+                    );
+                    myGradient.addColorStop(0, 'hsl(0,100%,50%,1)')
+                    myGradient.addColorStop(1, 'hsl(0,100%,50%,0)')
+                    ctx.fillStyle = myGradient;
+                    ctx.beginPath()
+                    ctx.arc(x, y, r, 0, 2 * Math.PI)
+                    ctx.fill();
                 }
-            }
 
-            resolve();
-        })
-    },
+                // AdditionTable füllen
+                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
 
-    drawAdditionTable() {
-        console.log('Draw Addition Table');
-        elements.containerPreview.innerHTML = '';
-        const cAddition = document.createElement('canvas');
-        elements.containerPreview.append(cAddition)
+                for (let y = 0; y < cAddition.height; y++) {
+                    this.additionTable.push([])
+                    for (let x = 0; x < cAddition.width; x++) {
+                        let index = (y * cAddition.width + x) * 4;
+                        let idt = imgData.data;
+                        let value = idt[index] / 255;
+
+                        // Add Noise
+                        value += Math.random() * this.addNoise;
+
+                        this.additionTable[y].push([value]);
+                    }
+                }
+
+                resolve();
+            })
+        },
+
+            drawAdditionTable() {
+                console.log('Draw Addition Table');
+                elements.containerPreview.innerHTML = '';
+                const cAddition = document.createElement('canvas');
+                elements.containerPreview.append(cAddition)
         const ctx = cAddition.getContext('2d');
-        cAddition.width = settings.cSize.x;
-        cAddition.height = settings.cSize.y;
-        cAddition.className = 'preview';
-        const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
+                cAddition.width = settings.cSize.x;
+                cAddition.height = settings.cSize.y;
+                cAddition.className = 'preview';
+                const imgData = ctx.getImageData(0, 0, cAddition.width, cAddition.height);
 
-        for (let y = 0; y < cAddition.height; y++) {
+                for(let y = 0; y<cAddition.height; y++) {
             for (let x = 0; x < cAddition.width; x++) {
                 let index = (y * cAddition.width + x) * 4;
                 imgData.data[index] = ~~(this.additionTable[y][x] * 255)

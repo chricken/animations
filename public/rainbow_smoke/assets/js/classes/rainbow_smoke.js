@@ -31,7 +31,7 @@ class RainbowSmoke {
         console.log('numIterationsPerUpdate', numIterationsPerUpdate);
 
         // Einfluss des Additiontables auf die Farbverteilung
-        this.additionInflux = additionInflux;
+        this.additionInflux = settings.additionInflux;
 
         // Ob die Addition umgekehrt interpretiert werden soll
         // true: hellere Bereiche werden früher gefüllt.
@@ -53,13 +53,14 @@ class RainbowSmoke {
         this.dividerSimilarity = dividerSimilarity;
 
         // URL zum zu ladenden Bild für die Addition
-        this.additionURL = './assets/img/' + additionFilename;
+        // this.additionURL = settings.additionURL;
+        this.additionURL = './assets/img/' + settings.additionFilename;
 
         // URL zum zu ladenden Bild für die Farbauswahl
-        this.colorURL = './assets/img/' + colorFilename;
+        this.colorsURL = './assets/img/' + settings.colorsFilename;
 
         // Anzahl der Bälle für die Ball-Addition
-        this.numBalls = numBalls;
+        this.numBalls = settings.numBalls;
 
         // Anzahl der Updates, die je Iteration gemacht werden sollen
         // const numIterationsPerUpdate = numIterationsPerUpdate;
@@ -96,7 +97,7 @@ class RainbowSmoke {
             this.drawAdditionTable
         ).then(
             () => {
-                if (settings.colorFileContent) {
+                if (settings.colorsFilename) {
                     this.fillColorTableImg()
                 } else {
                     this.fillColorTable()

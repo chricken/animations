@@ -11,7 +11,7 @@ const draw = {
             numIterationsAtAll: 500,
             noiseZoom: 5,
             numBalls: 20,
-            showNoiseMult: 0,
+            showNoiseMult: 100,
             additionInflux: 20,
             dividerSimilarity: 40000,
             additionFilename: 'chricken_highly_detailed_ink_line_drawing_outlines_high_contras_5a53f025-1ef1-4256-85fa-5ad4645cb661.png',

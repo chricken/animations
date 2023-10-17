@@ -22,6 +22,9 @@ const settings = {
         let result = `${settings.basePath}_${helpers.leadingZero(settings.fileIndex, 4)}.png`;
         settings.fileIndex++;
         return result;
+    },
+    set path(val) {
+        
     }
 }
 

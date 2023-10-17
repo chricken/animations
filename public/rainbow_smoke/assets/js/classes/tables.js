@@ -120,49 +120,50 @@ const tables = {
 
             elements.containerPreview.append(cColor);
 
-            // const imgColor = document.createElement('img');
-            // imgColor.addEventListener('load', () => {
-            // ctx.drawImage(imgColor, 0, 0, cColor.width, cColor.height);
+            const imgColors = document.createElement('img');
+            imgColors.addEventListener('load', () => {
+                ctx.drawImage(imgColors, 0, 0, cColor.width, cColor.height);
+                /*
+                ctx.drawImage(
+                    settings.colorFileContent,
+                    0,
+                    0,
+                    cColor.width,
+                    cColor.height
+                );
+                */
 
-            ctx.drawImage(
-                settings.colorFileContent,
-                0,
-                0,
-                cColor.width,
-                cColor.height
-            );
+                let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
 
-            let imgData = ctx.getImageData(0, 0, cColor.width, cColor.height);
-
-            for (let y = 0; y < imgData.height; y++) {
-                // this.colorTable.push([])
-                for (let x = 0; x < imgData.width; x++) {
-                    let index = (y * imgData.width + x) * 4;
-                    let dt = imgData.data
-                    this.colorTable.push([dt[index], dt[index + 1], dt[index + 2]])
+                for (let y = 0; y < imgData.height; y++) {
+                    // this.colorTable.push([])
+                    for (let x = 0; x < imgData.width; x++) {
+                        let index = (y * imgData.width + x) * 4;
+                        let dt = imgData.data
+                        this.colorTable.push([dt[index], dt[index + 1], dt[index + 2]])
+                    }
                 }
-            }
 
-            resolve();
+                resolve();
 
-            // })
+                })
 
-            // imgColor.addEventListener('error', reject)
+                imgColors.addEventListener('error', reject)
 
-            // imgColor.src = this.colorURL;
-        })
-    },
+                imgColors.src = this.colorsURL;
+            })
+        },
 
-    fillColorTable() {
-        console.log('fillColorTable');
-        let numAllColors = 256 ** 3;
-        let numPx = settings.cSize.x * settings.cSize.y;
-        let colorInkrement = numAllColors / numPx;
+            fillColorTable() {
+            console.log('fillColorTable');
+            let numAllColors = 256 ** 3;
+            let numPx = settings.cSize.x * settings.cSize.y;
+            let colorInkrement = numAllColors / numPx;
 
-        this.colorTable = [];
-        // Schleife, die für jeden Pixel eine Farbe in ein Array schreibt
-        // Die Farben sind gleichmäßig über das 8bit-RGB-Farbsystem verteilt
-        for (let i = 0; i < numAllColors; i += colorInkrement) {
+            this.colorTable = [];
+            // Schleife, die für jeden Pixel eine Farbe in ein Array schreibt
+            // Die Farben sind gleichmäßig über das 8bit-RGB-Farbsystem verteilt
+            for(let i = 0; i<numAllColors; i += colorInkrement) {
             let color = Math.round(i).toString(16);
             color = helpers.leadingZero(color, 6);
             let r = color[0] + color[1];

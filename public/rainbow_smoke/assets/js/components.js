@@ -4,34 +4,6 @@ import settings, { elements } from '../../../modules/settings.js';
 import { create } from '../../../modules/dom.js';
 
 const components = {
-    commonSettings(parent) {
-        console.log(parent);
-
-        // Canvas Size
-        components.range({
-            parent,
-            legend: 'Canvas Size X',
-            value: 500,
-            min: 50,
-            max: 4000,
-            callback(evt) {
-                settings.cSize.x = evt.value;
-                console.log(settings);
-            }
-        })
-
-        // Save File
-        components.checkbox({
-            parent,
-            legend: 'Save File?',
-            checked: settings.saveFile,
-            callback(evt) {
-                settings.saveFile = evt.target.checked;
-            }
-        })
-
-    },
-
     checkbox({ parent, legend, callback, checked }) {
         let container = create({
             parent
@@ -40,7 +12,8 @@ const components = {
         create({
             parent: container,
             type: 'span',
-            content: legend
+            content: legend,
+            classes: ['legend']
         })
 
         let cb = create({
@@ -67,6 +40,7 @@ const components = {
             type: 'span',
             content: legend,
             parent: container,
+            classes: ['legend'],
         })
 
         const elInput = create({
@@ -82,7 +56,7 @@ const components = {
         return [elInput, container]
     },
 
-    range({ parent, legend, callback, min, max, step,value }) {
+    range({ parent, legend, callback, min, max, step, value }) {
         const container = create({
             parent,
             classes: ['container'],
@@ -91,7 +65,9 @@ const components = {
         // Beschriftung
         create({
             type: 'span',
-            content: legend
+            content: legend,
+            parent: container,
+            classes: ['legend']
         })
 
         // Range
@@ -117,12 +93,83 @@ const components = {
                 value
             },
             listeners: {
-                input(evt) {
+                change(evt) {
+                    inputText.value = eval(inputText.value);
                     inputRange.value = inputText.value;
                     callback(evt)
                 }
             }
 
+        })
+    },
+
+    selectbox({ parent, legend, callback, options, value}) {
+        const containerSelect = create({
+            parent,
+            classes: ['container'],
+        })
+
+        create({
+            type: 'span',
+            content: legend,
+            parent: containerSelect,
+            classes: ['legend']
+        })
+
+        const elAuswahl = create({
+            type: 'select',
+            parent: containerSelect,
+            listeners: {
+                change: callback
+            }
+        })
+        // None-Auswahl
+        create({
+            type: 'option',
+            parent: elAuswahl,
+            content: 'Bitte wählen',
+            attr: {
+                value: 'none'
+            }
+        })
+
+        // Optionen für die Select
+        options.forEach(addition => {
+            create({
+                type: 'option',
+                parent: elAuswahl,
+                content: addition.text,
+                attr: {
+                    value: addition.value
+                }
+            })
+        })
+        elAuswahl.value = value;
+    },
+
+    textbox({parent, value, callback, legend}){
+        let container = create({
+            parent,
+            classes: ['container'],
+        })
+
+        create({
+            parent: container,
+            type: 'span',
+            content: legend,
+            classes: ['legend']
+        })
+
+        let cb = create({
+            type: 'input',
+            parent: container,
+            attr: {
+                type: 'text',
+                value
+            },
+            listeners: {
+                change: callback
+            }
         })
     }
 }
