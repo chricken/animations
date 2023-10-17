@@ -35,13 +35,13 @@ class RainbowSmoke {
 
         // Ob die Addition umgekehrt interpretiert werden soll
         // true: hellere Bereiche werden früher gefüllt.
-        this.additionInvert = additionInvert;
+        this.additionInvert = settings.additionInvert;
 
         // Multiplier, um beim Rendern die Noise anzuzeigen
-        this.showNoiseMult = showNoiseMult;
+        this.showNoiseMult = settings.showNoiseMult;
 
         // Zoom für Addition Noise
-        this.noiseZoom = noiseZoom;
+        this.noiseZoom = settings.noiseZoom;
 
         // Zusätzliches Rauschen für die Addition
         this.addNoise = settings.addNoise;
@@ -50,7 +50,7 @@ class RainbowSmoke {
         // Divider, der das Finden ähnlich-farbiger Pixel beschleunigt 
         // auf Kosten der Qualität
         // Niedrigere Zahl = schneller/Schlechter
-        this.dividerSimilarity = dividerSimilarity;
+        this.dividerSimilarity = settings.dividerSimilarity;
 
         // URL zum zu ladenden Bild für die Addition
         // this.additionURL = settings.additionURL;
@@ -93,6 +93,8 @@ class RainbowSmoke {
             this.fillPxTable
         ).then(
             this.sortPxTable
+        ).then(
+            this.invertAdditionTable
         ).then(
             this.drawAdditionTable
         ).then(

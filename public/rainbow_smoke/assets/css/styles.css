@@ -10,8 +10,14 @@ canvas {
     /* background-color: #000; */
 }
 .preview {
+    position: relative;
+    display: block-inline;
     max-height:120px;
     width: auto;
+}
+.uiHead {
+    margin:0;
+    color:rgba(0, 0, 0, .3)
 }
 .container {
     position: relative;

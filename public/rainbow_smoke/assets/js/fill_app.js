@@ -8,6 +8,7 @@ import lStore from './localstorage.js';
 
 const fillApp = () => {
     // Canvas zeichnen
+    /*
     elements.c = create({
         type: 'canvas',
         parent: elements.main,
@@ -17,6 +18,14 @@ const fillApp = () => {
         }
     })
     elements.ctx = elements.c.getContext('2d');
+    */
+
+    elements.containerCanvasDraw = create({
+        parent: elements.main,
+        classes: ['container']
+    })
+
+    components.renewCanvas()
 
     // UI füllen
     const containerUI = create({
@@ -25,11 +34,94 @@ const fillApp = () => {
         parent: elements.main,
     })
 
+    // Bilder speichern
+    components.checkbox({
+        parent: containerUI,
+        legend: 'Save File?',
+        checked: settings.saveFile,
+        callback(evt) {
+            settings.saveFile = evt.target.checked;
+            lStore.saveSettings();
+        }
+    })
+
+    const containerRes = create({
+        parent: containerUI,
+        classes: ['container']
+    })
+
+    create({
+        content: 'Auflösung',
+        parent: containerRes,
+        type: 'h3',
+        classes: ['uiHead']
+    })
+
+    // X-Auflösung 
+    components.range({
+        parent: containerRes,
+        legend: 'Auflösung Horizontal',
+        min: 10,
+        max: 4096,
+        step: 1,
+        value: settings.cSize.x,
+        callback(evt) {
+            settings.cSize.x = +evt.target.value;
+            lStore.saveSettings();
+            components.renewCanvas();
+        }
+    })
+    
+    // Y-Auflösung 
+    components.range({
+        parent: containerRes,
+        legend: 'Auflösung Vertikal',
+        min: 10,
+        max: 4096,
+        step: 1,
+        value: settings.cSize.y,
+        callback(evt) {
+            settings.cSize.y = +evt.target.value;
+            lStore.saveSettings();
+            components.renewCanvas();
+        }
+    })
+    
+    // Genauigkeit der Farbfindung
+    components.range({
+        parent: containerUI,
+        legend: 'Farbgenauigkeit',
+        min: 100,
+        max: 10000,
+        step: 1,
+        value: settings.dividerSimilarity,
+        callback(evt) {
+            settings.dividerSimilarity = +evt.target.value;
+            lStore.saveSettings();
+        }
+    })
+
+    // Show Addition in Pre-Render
+    components.range({
+        parent: containerUI,
+        legend: 'Sichtbarkeit der Addition',
+        min: 0,
+        max: 100,
+        step: 1,
+        value: settings.showNoiseMult,
+        callback(evt) {
+            settings.showNoiseMult = +evt.target.value;
+            lStore.saveSettings();
+            components.renewCanvas();
+        }
+    })
+
     // Colortable Image
     components.textbox({
         parent: containerUI,
         callback(evt) {
-            settings.colorsFilename = evt.target.value
+            settings.colorsFilename = evt.target.value;
+            lStore.saveSettings();
         },
         value: settings.colorsFilename,
         legend: 'URL zum Colortable Image'
@@ -55,8 +147,6 @@ const fillApp = () => {
         }
     })
     */
-
-
 
     // Stärke Noise 
     components.range({
@@ -90,7 +180,8 @@ const fillApp = () => {
     create({
         content: 'Addition',
         parent: containerUI,
-        type: 'h3'
+        type: 'h3',
+        classes: ['uiHead']
     })
 
     // Addition
@@ -124,7 +215,8 @@ const fillApp = () => {
     components.textbox({
         parent: containerUI,
         callback(evt) {
-            settings.additionFilename = evt.target.value
+            settings.additionFilename = evt.target.value;
+            lStore.saveSettings();
         },
         value: settings.additionFilename,
         legend: 'Filename Addition Image'
@@ -166,6 +258,37 @@ const fillApp = () => {
             settings.numBalls = +evt.target.value;
             lStore.saveSettings();
         }
+    })
+
+    components.checkbox({
+        parent:containerUI,
+        legend: 'Invert Addition',
+        checked: settings.additionInvert,
+        callback(evt){
+            settings.additionInvert = +evt.target.checked;
+            lStore.saveSettings();
+        }
+    })
+
+    // Noise & Julia Zoom
+    components.range({
+        parent: containerUI,
+        legend: 'Zoom',
+        min: 1,
+        max: 40,
+        step: 1,
+        value: settings.noiseZoom,
+        callback(evt) {
+            settings.noiseZoom = +evt.target.value;
+            lStore.saveSettings();
+        }
+    })
+
+
+    // Linie
+    create({
+        parent:containerUI,
+        type:'hr'
     })
 
     // Button zum Rendern

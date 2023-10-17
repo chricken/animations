@@ -4,9 +4,25 @@ import settings, { elements } from '../../../modules/settings.js';
 import { create } from '../../../modules/dom.js';
 
 const components = {
+
+    renewCanvas() {
+        if (elements.c) elements.c.remove();
+
+        elements.c = create({
+            type: 'canvas',
+            parent:elements.containerCanvasDraw,
+            attr: {
+                width: settings.cSize.x,
+                height: settings.cSize.y
+            }
+        })
+        elements.ctx = elements.c.getContext('2d');
+    },
+
     checkbox({ parent, legend, callback, checked }) {
         let container = create({
-            parent
+            parent,
+            classes: ['container']
         })
 
         create({
@@ -103,7 +119,7 @@ const components = {
         })
     },
 
-    selectbox({ parent, legend, callback, options, value}) {
+    selectbox({ parent, legend, callback, options, value }) {
         const containerSelect = create({
             parent,
             classes: ['container'],
@@ -147,7 +163,7 @@ const components = {
         elAuswahl.value = value;
     },
 
-    textbox({parent, value, callback, legend}){
+    textbox({ parent, value, callback, legend }) {
         let container = create({
             parent,
             classes: ['container'],

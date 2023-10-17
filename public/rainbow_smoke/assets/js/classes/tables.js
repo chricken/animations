@@ -146,24 +146,24 @@ const tables = {
 
                 resolve();
 
-                })
-
-                imgColors.addEventListener('error', reject)
-
-                imgColors.src = this.colorsURL;
             })
-        },
 
-            fillColorTable() {
-            console.log('fillColorTable');
-            let numAllColors = 256 ** 3;
-            let numPx = settings.cSize.x * settings.cSize.y;
-            let colorInkrement = numAllColors / numPx;
+            imgColors.addEventListener('error', reject)
 
-            this.colorTable = [];
-            // Schleife, die für jeden Pixel eine Farbe in ein Array schreibt
-            // Die Farben sind gleichmäßig über das 8bit-RGB-Farbsystem verteilt
-            for(let i = 0; i<numAllColors; i += colorInkrement) {
+            imgColors.src = this.colorsURL;
+        })
+    },
+
+    fillColorTable() {
+        console.log('fillColorTable');
+        let numAllColors = 256 ** 3;
+        let numPx = settings.cSize.x * settings.cSize.y;
+        let colorInkrement = numAllColors / numPx;
+
+        this.colorTable = [];
+        // Schleife, die für jeden Pixel eine Farbe in ein Array schreibt
+        // Die Farben sind gleichmäßig über das 8bit-RGB-Farbsystem verteilt
+        for (let i = 0; i < numAllColors; i += colorInkrement) {
             let color = Math.round(i).toString(16);
             color = helpers.leadingZero(color, 6);
             let r = color[0] + color[1];
@@ -208,7 +208,7 @@ const tables = {
             let zIndex = rnd(0, this.colorTable.length - 1);
             [this.colorTable[i], this.colorTable[zIndex]] = [this.colorTable[zIndex], this.colorTable[i]];
         }
-    }
+    },
 
 }
 
