@@ -11,7 +11,7 @@ canvas {
 }
 .preview {
     position: relative;
-    display: block-inline;
+    display: inline-block;
     max-height:120px;
     width: auto;
 }

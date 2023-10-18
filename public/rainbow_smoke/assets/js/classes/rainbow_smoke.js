@@ -6,29 +6,13 @@ import ajax from '../../../../modules/ajax.js';
 import addition from './addition.js';
 import tables from './tables.js';
 
-let fileNo = 0;
-
 class RainbowSmoke {
     pxTableindex = 0;
 
-    constructor({
-        additionInflux = 10,
-        additionInvert = true,
-        showNoiseMult = 100,
-        noiseZoom = 60,
-        dividerSimilarity = 1000,
-        additionFilename = 'Apophysis-2.png',
-        colorFilename = '041002_174545.jpg',
-        numIterationsAtAll = 300,
-        additionToUse = 'fillAdditionTableImg',
-        addNoise = 0,
-        numBalls = 15,
-        numSeeds = 3
-    } = {}) {
+    constructor() {
 
         // Anzahl der Iterationen pro Update
         const numIterationsPerUpdate = ~~((settings.cSize.x * settings.cSize.y) / settings.numIterationsAtAll)
-        console.log('numIterationsPerUpdate', numIterationsPerUpdate);
 
         // Einfluss des Additiontables auf die Farbverteilung
         this.additionInflux = settings.additionInflux;
@@ -45,7 +29,6 @@ class RainbowSmoke {
 
         // Zusätzliches Rauschen für die Addition
         this.addNoise = settings.addNoise;
-        console.log(this.addNoise);
 
         // Divider, der das Finden ähnlich-farbiger Pixel beschleunigt 
         // auf Kosten der Qualität
@@ -88,7 +71,6 @@ class RainbowSmoke {
 
         // Addition hinzufügen.
         // Da hier ggf mit Dateien gearbeitet wird, sind es grundsätzlich Promises 
-        console.log();
         this[settings.additionToUse]().then(
             this.fillPxTable
         ).then(
@@ -100,9 +82,9 @@ class RainbowSmoke {
         ).then(
             () => {
                 if (settings.colorsFilename) {
-                    this.fillColorTableImg()
+                    return this.fillColorTableImg()
                 } else {
-                    this.fillColorTable()
+                    return this.fillColorTable()
                 }
             }
         ).then(
@@ -118,9 +100,9 @@ class RainbowSmoke {
                 })
 
                 // console.log('startColor', this.pxTable2D[this.startPixel.y][this.startPixel.x]);
-                console.log('Start Update and Render');
+                // console.log('Start Update and Render');
                 // Nächste Runde
-                this.iterate(numIterationsPerUpdate)
+                this.iterate(numIterationsPerUpdate);
                 // this.update();
                 // this.render()
             }
@@ -201,14 +183,10 @@ class RainbowSmoke {
 
     // Übertragen des pxTables in das Canvas
     render() {
-        // console.clear()
-        // console.log(this.startPixel.x, this.startPixel.y);
         let imgData = elements.ctx.getImageData(0, 0, settings.cSize.x, settings.cSize.y);
         for (let y = 0; y < this.pxTable2D.length; y++) {
             for (let x = 0; x < this.pxTable2D[y].length; x++) {
-                // console.log(x, y, this.pxTable2D[y][x].color, this.pxTable2D[y][x].index, this.pxTable2D[y][x].distance);
                 if (this.pxTable2D[y][x].color) {
-                    // console.log(this.pxTable2D[y][x]);
                     // Aus den Imagedaten den richtigen Pixel nehmen und färben
                     imgData.data[((y * settings.cSize.x) + x) * 4] = this.pxTable2D[y][x].color[0];
                     imgData.data[((y * settings.cSize.x) + x) * 4 + 1] = this.pxTable2D[y][x].color[1];
@@ -227,7 +205,6 @@ class RainbowSmoke {
     }
 
     iterate(numIterations = 100) {
-        // console.log('iterate', numIterations);
         for (let i = 0; i < numIterations; i++) {
             this.update()
         }
@@ -235,11 +212,11 @@ class RainbowSmoke {
 
         // Animation
         if (settings.saveFile) {
-            ajax.saveCanvasToServer(elements.c, `image_${lead0(fileNo, 6)}.png`).then(
+            ajax.saveCanvasToServer(elements.c, `image_${lead0(settings.fileNo, 6)}.png`).then(
                 () => {
-                    fileNo++;
+                    settings.fileNo++;
                     // this.animate()
-                    console.log(settings.cancel);
+                    if(settings.cancel) console.log('Canceled');
                     if (this.colorTable.length > numIterations + 1 && !settings.cancel) {
                         requestAnimationFrame(() => this.iterate(numIterations));
                     } else {

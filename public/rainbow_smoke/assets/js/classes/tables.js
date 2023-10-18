@@ -16,15 +16,12 @@ class Px {
 const tables = {
     // Array für die Pixel vorbereiten
     fillPxTable() {
-        console.log('fillPxTable');
         // 1-Dimensionales Array mit den Pixeln des Canvas
         // In diesem Array wird beim Rendern die Farbe eingetragen
         this.pxTable = [];
 
         // Zusätzliches 2D-Array, um die umgebungsfarben effizient lesen zu können
         this.pxTable2D = []
-
-        console.log(this.startSeeds);
 
         for (let y = 0; y < settings.cSize.y; y++) {
             this.pxTable2D.push([])
@@ -81,7 +78,6 @@ const tables = {
     },
 
     sortPxTable() {
-        console.log('sortPxTable');
         // Alles Shufflen, damit die gleich weit entfernte zufällig hintereinander stehen
         for (let i = 0; i < this.pxTable.length; i++) {
             let zIndex = rnd(0, this.pxTable.length);
@@ -105,7 +101,6 @@ const tables = {
     fillColorTableImg() {
 
         this.colorTable = [];
-        console.log('fillColorTable');
         return new Promise((resolve, reject) => {
 
             const cColor = document.createElement('canvas');
@@ -155,7 +150,6 @@ const tables = {
     },
 
     fillColorTable() {
-        console.log('fillColorTable');
         let numAllColors = 256 ** 3;
         let numPx = settings.cSize.x * settings.cSize.y;
         let colorInkrement = numAllColors / numPx;
@@ -203,7 +197,6 @@ const tables = {
     },
 
     sortColorTable() {
-        console.log('sortColorTable');
         for (let i = 0; i < this.colorTable.length; i++) {
             let zIndex = rnd(0, this.colorTable.length - 1);
             [this.colorTable[i], this.colorTable[zIndex]] = [this.colorTable[zIndex], this.colorTable[i]];

@@ -87,6 +87,20 @@ const fillApp = () => {
         }
     })
     
+    // Number of Iterations
+    components.range({
+        parent: containerUI,
+        legend: 'Anzahl der Iterationen',
+        min: 1,
+        max: 11800,
+        step: 1,
+        value: settings.numIterationsAtAll,
+        callback(evt) {
+            settings.numIterationsAtAll = +evt.target.value;
+            lStore.saveSettings();
+        }
+    })
+    
     // Genauigkeit der Farbfindung
     components.range({
         parent: containerUI,
@@ -298,6 +312,7 @@ const fillApp = () => {
         content: 'Render',
         listeners: {
             click() {
+                settings.fileNo = 0;
                 settings.cancel = false;
                 draw.init();
             }

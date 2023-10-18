@@ -12,6 +12,7 @@ const init = () => {
     Object.assign(settings, {
         // Pfad, um Dateien zu speichern, Dazu muss saveFile auf 'true' stehen
         basePath: '../results/img',
+        fileNo:0,
         // Sollen die Ergebnisse als Datei gespeichert werden?
         // Dazu muss die Webseite über den eigenen Server geöffnet 
         saveFile: false,

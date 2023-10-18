@@ -308,7 +308,6 @@ const addition = {
     },
 
     drawAdditionTable() {
-        console.log('Draw Addition Table');
         elements.containerPreview.innerHTML = '';
         const cAddition = document.createElement('canvas');
         elements.containerPreview.append(cAddition)
