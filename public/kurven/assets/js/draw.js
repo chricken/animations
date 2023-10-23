@@ -1,42 +1,80 @@
 'use strict';
 
 import settings, { elements } from '../../../modules/settings.js';
-import { rnd, lead0 } from '../../../modules/helpers.js';
+import { rnd, lead0, clamp } from '../../../modules/helpers.js';
+import ajax from '../../../../modules/ajax.js';
 
 const draw = {
     yStart: 0,
     yEnd: 0,
+
     x1: 0,
-    x2: 0,
     y1: 0,
+
+    x2: 0,
     y2: 0,
-    renderCurve() {
+
+    x3: 0,
+    y3: 0,
+
+    x4: 0,
+    y4: 0,
+
+    renderCurves() {
         let c = elements.c;
         let ctx = c.getContext('2d');
 
+        ctx.clearRect(0, 0, c.width, c.height);
+
         ctx.lineWidth = settings.lineWidth;
-        ctx.strokeStyle = `hsl(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%)`
-        /*
-        let p1 = [rnd(c.width / 2,0), rnd(0, c.height / 1.5)];
-        let p2 = [rnd(c.width / 2, c.width), rnd(c.height / .3, c.height)];
-        */
+        console.clear();
+        console.log(settings.curves);
+
+        for (let i = 0; i < settings.curves.length; i++) {
+
+            const curve = settings.curves[i];
+
+            ctx.strokeStyle = curve.color;
+
+            ctx.beginPath();
+
+            /*
+            ctx.fillStyle = '#f00'
+            ctx.fillRect(p1.x, p1.y, 1, 1)
+            ctx.fillStyle = '#0f0'
+            ctx.fillRect(p2.x, p2.y, 1, 1)
+            */
+
+            ctx.moveTo(...curve.startPoint);
+            ctx.bezierCurveTo(
+                ...curve.Points1,
+                ...curve.middlePoint
+            );
+            ctx.bezierCurveTo(
+                ...curve.Points2,
+                ...curve.endPoint
+            );
+
+            ctx.stroke()
+        }
+    },
+    addCurve() {
 
         let p1 = [draw.x1, draw.y1];
         let p2 = [draw.x2, draw.y2];
 
-        ctx.beginPath();
+        let hue = settings.hue + 360;
+        hue = hue % 360;
 
+        settings.curves.push({
+            startPoint: [0, draw.yStart],
+            Points1: [draw.x1, draw.y1, draw.x2, draw.y2],
+            middlePoint: [draw.xMiddle, draw.yMiddle],
+            Points2: [draw.x3, draw.y3, draw.x4, draw.y4],
+            endPoint: [elements.c.width, draw.yEnd],
+            color: `hsla(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%,.1)`
+        });
 
-        ctx.fillStyle = '#f00'
-        ctx.fillRect(p1.x, p1.y, 1, 1)
-        ctx.fillStyle = '#0f0'
-        ctx.fillRect(p2.x, p2.y, 1, 1)
-
-
-        ctx.moveTo(0, draw.yStart);
-        ctx.bezierCurveTo(...p1, ...p2, c.width, draw.yEnd);
-
-        ctx.stroke()
     },
     step() {
         // console.clear()
@@ -44,51 +82,87 @@ const draw = {
         for (let i = 0; i < settings.numIterations; i++) {
             settings.counter++
             let changed = false;
-            draw.renderCurve();
+            // draw.renderCurve();
+            draw.addCurve()
 
-            let vorher = ~~draw.x1;
-            draw.x1 += rnd(-settings.deltaPos * 10, settings.deltaPos * 10) / 10;
-            // if (~~draw.x1 != vorher) console.log('x1', draw.x1);
+            draw.x1 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.x1 = clamp(draw.x1, 0, elements.c.width);
+            draw.y1 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.y1 = clamp(draw.y1, 0, elements.c.height);
 
-            vorher = ~~draw.x2;
-            draw.x2 += rnd(-settings.deltaPos * 10, settings.deltaPos * 10) / 10;
-            // if (~~draw.x2 != vorher) console.log('x2', draw.x2);
+            draw.x2 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.x2 = clamp(draw.x2, 0, elements.c.width);
+            draw.y2 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.y2 = clamp(draw.y2, 0, elements.c.height);
 
-            vorher = ~~draw.y1;
-            draw.y1 += rnd(-settings.deltaPos * 10, settings.deltaPos * 10) / 10;
-            // if (~~draw.y1 != vorher) console.log('y1', draw.y1);
+            draw.x3 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.x3 = clamp(draw.x3, 0, elements.c.width);
+            draw.y3 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.y3 = clamp(draw.y3, 0, elements.c.height);
 
-            vorher = ~~draw.y2;
-            draw.y2 += rnd(-settings.deltaPos * 10, settings.deltaPos * 10) / 10;
-            // if (~~draw.y2 != vorher) console.log('y2', draw.y2);
+            draw.x4 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.x4 = clamp(draw.x4, 0, elements.c.width);
+            draw.y4 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
+            draw.y4 = clamp(draw.y4, 0, elements.c.height);
 
-            vorher = ~~draw.yStart;
-            draw.yStart += rnd(-settings.deltaPosStartEnd * 10, settings.deltaPosStartEnd * 10) / 10;
-            // if (~~draw.yStart != vorher) console.log('yStart', draw.yStart);
+            draw.xMiddle = (draw.x2 + draw.x3) / 2
+            draw.yMiddle = (draw.y2 + draw.y3) / 2
 
-            vorher = ~~draw.yEnd;
-            draw.yEnd += rnd(-settings.deltaPosStartEnd * 10, settings.deltaPosStartEnd * 10) / 10;
-            // if (~~draw.yEnd != vorher) console.log('yEnd', draw.yEnd);
+            draw.yStart += rnd(-settings.deltaPosStartEnd * 1000, settings.deltaPosStartEnd * 1000) / 1000;
+
+            draw.yEnd += rnd(-settings.deltaPosStartEnd * 1000, settings.deltaPosStartEnd * 1000) / 1000;
 
             // Farben 
-            settings.hue += settings.deltaHue;
+            settings.hue += rnd(-settings.deltaHue * 1000, settings.deltaHue * 1000) / 1000;
         }
+        if (settings.curves.length > settings.maxCurves) {
+            let numToKill = settings.curves.length - settings.maxCurves;
+            settings.curves.splice(0, numToKill);
+        }
+        draw.renderCurves();
+
         // console.log(settings.counter);
-        requestAnimationFrame( draw.step);
+        draw.animate();
+    },
+    animate() {
+        if (settings.saveFile) {
+            if (settings.fileNo < settings.maxFiles) {
+                ajax.saveCanvasToServer(elements.c, `image_${lead0(settings.fileNo, 6)}.png`).then(
+                    () => {
+                        settings.fileNo++;
+                        requestAnimationFrame(draw.step)
+                    }
+                ).catch(
+                    console.warn
+                )
+            }
+        } else {
+            requestAnimationFrame(draw.step)
+        }
     },
     init() {
         settings.counter = 0;
         elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height)
-        draw.yStart = rnd(0, elements.c.height);
-        draw.yEnd = rnd(0, elements.c.height);
 
-        draw.x1 = rnd(0, elements.c.width / 3 * 2);
-        draw.x2 = rnd((elements.c.width - draw.x1) + (elements.c.width / 10), (elements.c.width / 10));
+        draw.yStart = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
+        draw.yEnd = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
 
+        draw.x1 = elements.c.width / 6;
         draw.y1 = rnd(0, elements.c.height);
+
+        draw.x2 = elements.c.width / 6 * 2;
         draw.y2 = rnd(0, elements.c.height);
 
-        requestAnimationFrame( draw.step);
+        draw.x3 = elements.c.width / 6 * 4;
+        draw.y3 = rnd(0, elements.c.height);
+
+        draw.x4 = elements.c.width / 6 * 5;
+        draw.y4 = rnd(0, elements.c.height);
+
+        draw.xMiddle = (draw.x2 + draw.x3) / 2
+        draw.yMiddle = (draw.y2 + draw.y3) / 2
+
+        draw.animate();
     }
 }
 

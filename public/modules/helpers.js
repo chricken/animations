@@ -20,7 +20,11 @@ const helpers = {
         let rnd = helpers.createNumber;
         return `hsla(${rnd(minHue, maxHue)}, ${rnd(minSat, maxSat)}%, ${rnd(minLight, maxLight)}%, ${rnd(minAlpha * 100, maxAlpha * 100) / 100})`;
     },
-
+    clamp(value, min, max) {
+        value = Math.min(value, max);
+        value = Math.max(value, min);
+        return value;
+    },
     // Pythagoras - a² = b² + c²
     pythagorasPoints(point1, point2) {
         let a = 0, b = 0;
@@ -86,3 +90,4 @@ export let RtA = helpers.relToAbs;
 export let rnd = helpers.createNumber;
 export let saveC = helpers.writeCToFile;
 export let lead0 = helpers.leadingZero;
+export let clamp = helpers.clamp;

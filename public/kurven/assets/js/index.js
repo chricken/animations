@@ -15,21 +15,27 @@ const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: false,
+        saveFile: true,
         cSize: {
-            x: ~~(1920 / 3),
-            y: ~~(1040 / 3),
+            x: ~~(1920 / 1),
+            y: ~~(1040 / 1),
         },
-        numIterations: 5,
-        lineWidth: .05,
 
-        deltaPos: 2,
-        deltaPosStartEnd: .001,
+        curves: [],
 
-        hue:rnd(0,360),
-        delta:rnd(0,100)/100,
-        sat:50,
-        light:50
+        maxCurves: 1000,
+        numIterations: 50,
+        lineWidth: .1,
+
+        maxFiles: 10800,
+
+        deltaPos: 1,
+        deltaPosStartEnd: 1,
+
+        hue: rnd(0, 360),
+        deltaHue: rnd(0, 300) / 100,
+        sat: 100,
+        light: 50
     })
     domMapping();
     fillApp();
