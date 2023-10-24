@@ -1,34 +1,25 @@
 'use strict';
 
-import settings, { elements } from '../../../modules/settings.js';
-import { rnd, lead0, clamp } from '../../../modules/helpers.js';
-import ajax from '../../../../modules/ajax.js';
+import settings, { elements } from '/modules/settings.js';
+import { rnd, lead0, clamp } from '/modules/helpers.js';
+import ajax from '/modules/ajax.js';
+import Point from './classes/point.js';
+import Attractor from './classes/attractor.js';
 
 const draw = {
     yStart: 0,
     yEnd: 0,
 
-    x1: 0,
-    y1: 0,
-
-    x2: 0,
-    y2: 0,
-
-    x3: 0,
-    y3: 0,
-
-    x4: 0,
-    y4: 0,
 
     renderCurves() {
         let c = elements.c;
         let ctx = c.getContext('2d');
 
-        ctx.clearRect(0, 0, c.width, c.height);
 
         ctx.lineWidth = settings.lineWidth;
-        console.clear();
-        console.log(settings.curves);
+        // console.clear();
+        // console.log(settings.curves);
+
 
         for (let i = 0; i < settings.curves.length; i++) {
 
@@ -46,75 +37,78 @@ const draw = {
             */
 
             ctx.moveTo(...curve.startPoint);
-            ctx.bezierCurveTo(
-                ...curve.Points1,
-                ...curve.middlePoint
-            );
-            ctx.bezierCurveTo(
-                ...curve.Points2,
-                ...curve.endPoint
-            );
+
+            for (let b = 0; b < curve.beziers.length; b++) {
+                ctx.bezierCurveTo(
+                    ...curve.beziers[b].p1,
+                    ...curve.beziers[b].p2,
+                    ...curve.beziers[b].endPoint
+                );
+            }
 
             ctx.stroke()
+
         }
     },
     addCurve() {
-
-        let p1 = [draw.x1, draw.y1];
-        let p2 = [draw.x2, draw.y2];
+        // Eine curve besteht aus mehreren Bezier-Kurven mit je zwei Stützpunkten und einem Endpunkt
+        let curve = {
+            beziers: []
+        };
+        settings.curves.push(curve);
 
         let hue = settings.hue + 360;
         hue = hue % 360;
+        curve.color = `hsla(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%,.1)`;
 
-        settings.curves.push({
-            startPoint: [0, draw.yStart],
-            Points1: [draw.x1, draw.y1, draw.x2, draw.y2],
-            middlePoint: [draw.xMiddle, draw.yMiddle],
-            Points2: [draw.x3, draw.y3, draw.x4, draw.y4],
-            endPoint: [elements.c.width, draw.yEnd],
-            color: `hsla(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%,.1)`
-        });
+        // Alle zwei Stützpunkte iterieren
+        for (let i = 0; i < settings.numPoints; i += 2) {
+            // Zur Kurve zwei Stützpunkte für eine Bezier hinzufügen
+            curve.beziers.push({
+                p1: [settings.points[i].x, settings.points[i].y],
+                p2: [settings.points[i + 1].x, settings.points[i + 1].y],
+            })
+        }
 
+        // Start- und Endpunkte als Zwischenwerte der Stützpunkte errechnen
+        curve.startPoint = [0, draw.yStart];
+        curve.beziers.forEach((bezier, index) => {
+            if (index < curve.beziers.length - 1) {
+                // SP = "Stützpunkt"
+                // Mitte zwischen dem zweiten SP der Kurve und dem ersten SP der drauffolgenden Kurve
+                
+                bezier.endPoint = [
+                    (bezier.p2[0] + curve.beziers[index + 1].p1[0]) / 2,
+                    (bezier.p2[1] + curve.beziers[index + 1].p1[1]) / 2,
+                ]
+            }
+        })
+        curve.beziers[curve.beziers.length - 1].endPoint = [elements.c.width, draw.yEnd];
+        // console.log(curve);
     },
     step() {
         // console.clear()
         // console.log(settings);
+
+        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+
         for (let i = 0; i < settings.numIterations; i++) {
+
+            settings.points.forEach(point => point.draw());
+            settings.attractors.forEach(attr => attr.draw());
+
             settings.counter++
-            let changed = false;
+
             // draw.renderCurve();
-            draw.addCurve()
-
-            draw.x1 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.x1 = clamp(draw.x1, 0, elements.c.width);
-            draw.y1 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.y1 = clamp(draw.y1, 0, elements.c.height);
-
-            draw.x2 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.x2 = clamp(draw.x2, 0, elements.c.width);
-            draw.y2 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.y2 = clamp(draw.y2, 0, elements.c.height);
-
-            draw.x3 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.x3 = clamp(draw.x3, 0, elements.c.width);
-            draw.y3 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.y3 = clamp(draw.y3, 0, elements.c.height);
-
-            draw.x4 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.x4 = clamp(draw.x4, 0, elements.c.width);
-            draw.y4 += rnd(-settings.deltaPos * 1000, settings.deltaPos * 1000) / 1000;
-            draw.y4 = clamp(draw.y4, 0, elements.c.height);
-
-            draw.xMiddle = (draw.x2 + draw.x3) / 2
-            draw.yMiddle = (draw.y2 + draw.y3) / 2
-
-            draw.yStart += rnd(-settings.deltaPosStartEnd * 1000, settings.deltaPosStartEnd * 1000) / 1000;
-
-            draw.yEnd += rnd(-settings.deltaPosStartEnd * 1000, settings.deltaPosStartEnd * 1000) / 1000;
+            draw.addCurve();
+            let delta = settings.deltaPosStartEnd;
+            draw.yStart += rnd(-delta * 1000, delta * 1000) / 1000;
+            draw.yEnd += rnd(-delta * 1000, delta * 1000) / 1000;
 
             // Farben 
             settings.hue += rnd(-settings.deltaHue * 1000, settings.deltaHue * 1000) / 1000;
         }
+        // Falls die Anzahl Kurven erreicht wurde, entferne die ersten paar wieder
         if (settings.curves.length > settings.maxCurves) {
             let numToKill = settings.curves.length - settings.maxCurves;
             settings.curves.splice(0, numToKill);
@@ -142,25 +136,15 @@ const draw = {
     },
     init() {
         settings.counter = 0;
-        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height)
+        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+
+        settings.points = [...new Array(settings.numPoints)].map(() => new Point())
+        settings.attractors = [...new Array(settings.numAttractors)].map(() => new Attractor())
+
+        console.log(settings);
 
         draw.yStart = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
         draw.yEnd = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
-
-        draw.x1 = elements.c.width / 6;
-        draw.y1 = rnd(0, elements.c.height);
-
-        draw.x2 = elements.c.width / 6 * 2;
-        draw.y2 = rnd(0, elements.c.height);
-
-        draw.x3 = elements.c.width / 6 * 4;
-        draw.y3 = rnd(0, elements.c.height);
-
-        draw.x4 = elements.c.width / 6 * 5;
-        draw.y4 = rnd(0, elements.c.height);
-
-        draw.xMiddle = (draw.x2 + draw.x3) / 2
-        draw.yMiddle = (draw.y2 + draw.y3) / 2
 
         draw.animate();
     }

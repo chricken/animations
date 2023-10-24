@@ -23,9 +23,13 @@ const init = () => {
 
         curves: [],
 
-        maxCurves: 1000,
+        // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
+        numPoints: 6,
+        numAttractors: 3,
+
+        maxCurves: 500,
         numIterations: 50,
-        lineWidth: .1,
+        lineWidth: 1,
 
         maxFiles: 10800,
 
