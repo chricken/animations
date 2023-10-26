@@ -8,11 +8,12 @@ class Point {
         // console.log(settings.padding, elements.c.width);
         this.x = rnd(0, elements.c.width);
         this.y = rnd(0, elements.c.height);
-        this.vx = rnd(-100, 100) / 20000;
-        this.vy = rnd(-100, 100) / 20000;
+        this.vx = rnd(-100, 100) / 50000;
+        this.vy = rnd(-100, 100) / 50000;
         // Die Anziehungskraft hängt direkt mit der Größe zusammen
-        this.size = .3;//rnd(1, 1);
+        this.size = rnd(15,15)/100;
         this.visible = false;
+        console.log(this.size);
     }
     draw() {
         if (this.visible) {
@@ -32,7 +33,7 @@ class Point {
         this.checkBorders();
     }
     move() {
-        let vy = this.vy;
+        // let vy = this.vy;
         settings.attractors.forEach(attr => {
             let distance = helpers.pythagoras(this.x - attr.x, this.y - attr.y);
             this.vx += ((attr.x - this.x) * this.size) / (distance ** 2) * attr.strength;

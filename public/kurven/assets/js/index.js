@@ -27,9 +27,9 @@ const init = () => {
         numPoints: 6,
         numAttractors: 3,
 
-        maxCurves: 500,
-        numIterations: 50,
-        lineWidth: 1,
+        maxCurves: 2000,
+        numIterations: 30,
+        lineWidth: .4,
 
         maxFiles: 10800,
 
@@ -37,10 +37,11 @@ const init = () => {
         deltaPosStartEnd: 1,
 
         hue: rnd(0, 360),
-        deltaHue: rnd(0, 300) / 100,
+        deltaHue:1 ,
         sat: 100,
         light: 50
     })
+    console.log(settings.deltaHue);
     domMapping();
     fillApp();
     // lStore.loadSettings()

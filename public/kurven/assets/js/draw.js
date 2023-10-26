@@ -18,7 +18,7 @@ const draw = {
 
         ctx.lineWidth = settings.lineWidth;
         // console.clear();
-        // console.log(settings.curves);
+        // console.log(settings.curves.length);
 
 
         for (let i = 0; i < settings.curves.length; i++) {
@@ -106,7 +106,7 @@ const draw = {
             draw.yEnd += rnd(-delta * 1000, delta * 1000) / 1000;
 
             // Farben 
-            settings.hue += rnd(-settings.deltaHue * 1000, settings.deltaHue * 1000) / 1000;
+            settings.hue += rnd(-settings.deltaHue * 100, settings.deltaHue * 100) / 100;
         }
         // Falls die Anzahl Kurven erreicht wurde, entferne die ersten paar wieder
         if (settings.curves.length > settings.maxCurves) {
