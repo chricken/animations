@@ -11,7 +11,7 @@ class Attractor {
         this.vx = rnd(-20, 20) / 300;
         this.vy = rnd(-20, 20) / 300;
         this.strength =.5;
-        this.size = 10;
+        this.size = 0;
     }
 
     move() {

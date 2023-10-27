@@ -59,7 +59,7 @@ const draw = {
 
         let hue = settings.hue + 360;
         hue = hue % 360;
-        curve.color = `hsla(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%,.1)`;
+        curve.color = `hsla(${(~~settings.hue) % 360},${settings.sat}%,${settings.light}%,${settings.opacity})`;
 
         // Alle zwei Stützpunkte iterieren
         for (let i = 0; i < settings.numPoints; i += 2) {
@@ -76,7 +76,7 @@ const draw = {
             if (index < curve.beziers.length - 1) {
                 // SP = "Stützpunkt"
                 // Mitte zwischen dem zweiten SP der Kurve und dem ersten SP der drauffolgenden Kurve
-                
+
                 bezier.endPoint = [
                     (bezier.p2[0] + curve.beziers[index + 1].p1[0]) / 2,
                     (bezier.p2[1] + curve.beziers[index + 1].p1[1]) / 2,
@@ -90,7 +90,11 @@ const draw = {
         // console.clear()
         // console.log(settings);
 
-        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+        // elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+        if (settings.fileNo % settings.fadeAfterFrames == 0) {
+            elements.ctx.fillStyle = 'rgba(0,0,0,.05)'
+            elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
+        }
 
         for (let i = 0; i < settings.numIterations; i++) {
 
@@ -102,8 +106,16 @@ const draw = {
             // draw.renderCurve();
             draw.addCurve();
             let delta = settings.deltaPosStartEnd;
-            draw.yStart += rnd(-delta * 1000, delta * 1000) / 1000;
-            draw.yEnd += rnd(-delta * 1000, delta * 1000) / 1000;
+            // draw.yStart += rnd(-delta * 1000, delta * 1000) / 1000;
+            // draw.yEnd += rnd(-delta * 1000, delta * 1000) / 1000;
+
+            draw.yStart += settings.deltaPosStart;
+            if (draw.yStart > elements.c.height || draw.yStart < 0)
+                settings.deltaPosStart *= -1
+
+            draw.yEnd += settings.deltaPosEnd;
+            if (draw.yEnd > elements.c.height || draw.yEnd < 0)
+                settings.deltaPosEnd *= -1
 
             // Farben 
             settings.hue += rnd(-settings.deltaHue * 100, settings.deltaHue * 100) / 100;
