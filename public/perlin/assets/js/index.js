@@ -5,6 +5,8 @@ import helpers, { rnd } from '../../../modules/helpers.js';
 import dom, { create } from '../../../modules/dom.js';
 import draw, { render } from './draw.js';
 
+import noises, { Perlin } from '../../../modules/noises.js';
+
 const domMapping = () => {
     elements.main = document.body;
 }
@@ -45,6 +47,9 @@ const init = () => {
     domMapping();
     fillApp();
     createRandom();
+    
+    const perlin = new Perlin(settings.p);
+    console.log(perlin.noise(1,2,3));
     requestAnimationFrame(render);
 
     

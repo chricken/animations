@@ -11,33 +11,52 @@ const domMapping = () => {
     elements.main = document.body;
 }
 
+const createRandom = () => {
+
+    settings.p = new Uint8Array([
+        ...[...new Array(6)].map(() => rnd(1, 254)),
+        ...(() => {
+            let p = [], i;
+            for (i = 0; i < 256; i++) p[i] = i;
+            for (i = 0; i < 255; i++) {
+                let t, j = Math.floor((i + 1) * Math.random());
+                t = p[j]; p[j] = p[j + 1]; p[j + 1] = t;
+            }
+            return p;
+        })()]);
+}
+
+
 const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: false,
+        saveFile: true,
         cSize: {
-            x: ~~(1920 / 2),
-            y: ~~(1040 / 2),
+            x: ~~(1920 / 1),
+            y: ~~(1040 / 1),
         },
 
         lines: [],
 
         // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 120,
+        numPoints: 1500,
 
-        numLines: 30,
-
-        lineWidth: .4,
+        res: 10,    //Frames pro Line
+        addX: 1,
+        moveX: .00000,
+        acc: 5, // Beschleunigung auf dem Weg nach unten
 
         maxFiles: 10800,
 
         hue: rnd(0, 360),
-        deltaHue:1 ,
+        deltaHue: 1,
         sat: 100,
         light: 50
     })
-    console.log(settings.deltaHue);
+
+    createRandom();
+
     domMapping();
     fillApp();
     // lStore.loadSettings()

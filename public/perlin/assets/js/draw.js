@@ -26,6 +26,7 @@ const draw = {
             let z = settings.z;
             [x, y, z] = [x / zoom, y / zoom, z / zoom];
             let valR = perlin.noise(x, y, z);
+            // console.log(perlin.noise(x, y, z));
             let valG = perlin.noise(x * .5, y, z);
             let valB = perlin.noise(y, x, z);
             // Wert (-1 -> 1) in (0 - 255) umwandeln
