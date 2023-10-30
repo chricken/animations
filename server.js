@@ -7,7 +7,8 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['linefields'];
+// const projectsToOpn = ['linefields'];
+const projectsToOpn = ['landflug'];
 
 server.use(express.static('public'));
 server.use((routes));
