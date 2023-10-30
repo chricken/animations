@@ -36,9 +36,10 @@ const draw = {
             ctx.fillRect(p2.x, p2.y, 1, 1)
             */
 
-            ctx.moveTo(...curve.startPoint);
+            // ctx.moveTo(...curve.startPoint);
+            ctx.moveTo(...curve.beziers[0].p1);
 
-            for (let b = 0; b < curve.beziers.length; b++) {
+            for (let b = 1; b < curve.beziers.length-1; b++) {
                 ctx.bezierCurveTo(
                     ...curve.beziers[b].p1,
                     ...curve.beziers[b].p2,
@@ -71,7 +72,7 @@ const draw = {
         }
 
         // Start- und Endpunkte als Zwischenwerte der Stützpunkte errechnen
-        curve.startPoint = [0, draw.yStart];
+        // curve.startPoint = [0, draw.yStart];
         curve.beziers.forEach((bezier, index) => {
             if (index < curve.beziers.length - 1) {
                 // SP = "Stützpunkt"
@@ -83,7 +84,7 @@ const draw = {
                 ]
             }
         })
-        curve.beziers[curve.beziers.length - 1].endPoint = [elements.c.width, draw.yEnd];
+        // curve.beziers[curve.beziers.length - 1].endPoint = [elements.c.width, draw.yEnd];
         // console.log(curve);
     },
     step() {

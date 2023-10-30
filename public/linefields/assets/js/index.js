@@ -15,26 +15,22 @@ const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: true,
+        saveFile: false,
         cSize: {
-            x: ~~(1920 / 1),
-            y: ~~(1040 / 1),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
 
-        curves: [],
+        lines: [],
 
         // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 12,
-        numAttractors: 3,
+        numPoints: 120,
 
-        maxCurves: 2000,
-        numIterations: 30,
+        numLines: 30,
+
         lineWidth: .4,
 
         maxFiles: 10800,
-
-        deltaPos: 1,
-        deltaPosStartEnd: 1,
 
         hue: rnd(0, 360),
         deltaHue:1 ,
