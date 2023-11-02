@@ -8,8 +8,8 @@ import Line from './classes/line.js';
 
 const draw = {
     step() {
-        console.clear();
-        console.log(settings.lines.length);
+        // console.clear();
+        // console.log(settings.lines.length);
         // Ein Bild rendern
         settings.counter++;
 
