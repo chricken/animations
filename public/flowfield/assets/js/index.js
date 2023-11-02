@@ -2,10 +2,8 @@
 
 import settings, { elements } from '../../../modules/settings.js';
 import fillApp from './fill_app.js';
-import lStore from './localstorage.js';
-import { rnd, lead0 } from '../../../modules/helpers.js';
+import { rnd, lead0, clamp } from '/modules/helpers.js';
 import draw from './draw.js';
-import components from './components.js';
 
 const domMapping = () => {
     elements.main = document.body;
@@ -26,42 +24,25 @@ const createRandom = () => {
         })()]);
 }
 
-
 const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: true,
+        saveFile: false,
         cSize: {
-            x: ~~(1920 / 1),
-            y: ~~(1040 / 1),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
-
-        lines: [],
-
-        // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 1500,
-
-        res: 10,    //Frames pro Line
-        addX: 1,
-        addZ:1/100,
-        moveX: .00000,
-        acc: 5, // Beschleunigung auf dem Weg nach unten
-
-        maxFiles: 10800,
-
-        hue: rnd(0, 360),
-        deltaHue:10,
-        sat: 100,
-        light: 50
+        
+        noiseZoom: 70,
+        numPoints:20000,
+        posZ : 0.1,
+        deltaZ : .3
     })
 
-    createRandom();
-
     domMapping();
+    createRandom();
     fillApp();
-    // lStore.loadSettings()
-    // createRandom();
     draw.init();
 
 }

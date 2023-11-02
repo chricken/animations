@@ -5,26 +5,31 @@ import settings, { elements } from './settings.js';
 
 
 const helpers = {
+
     // Errechnet aus relativen Werten zwischen 0 und 1 die Absolute Position im Canvas
     relToAbs(x, y, c = elements.c) {
         return [x * c.width, y * c.height];
     },
+
     // Erzeugen einer zufälligen Nummer
     createNumber(min, max, dec = 0) {
         dec = 10 ** dec;
         if (min > max) [min, max] = [max, min];
         return ~~((Math.random() * (max - min + (1 / dec)) + min) * dec) / dec;
     },
+
     // Erzeugen einer zufälligen Farbe
     createColor({ minHue = 0, maxHue = 360, minSat = 70, maxSat = 80, minLight = 60, maxLight = 80, minAlpha = 1, maxAlpha = 1 } = {}) {
         let rnd = helpers.createNumber;
         return `hsla(${rnd(minHue, maxHue)}, ${rnd(minSat, maxSat)}%, ${rnd(minLight, maxLight)}%, ${rnd(minAlpha * 100, maxAlpha * 100) / 100})`;
     },
+
     clamp(value, min, max) {
         value = Math.min(value, max);
         value = Math.max(value, min);
         return value;
     },
+
     // Pythagoras - a² = b² + c²
     pythagorasPoints(point1, point2) {
         let a = 0, b = 0;
@@ -43,8 +48,19 @@ const helpers = {
         }
 
     },
+
     pythagoras(a, b) {
         return Math.sqrt(a * a + b * b);
+    },
+
+    moveByAngleSpeed(x, y, angle, speed) {
+        // sin a = gk / h
+        // cos a = ak / h
+
+        let deltaX = Math.sin(angle) * speed;
+        let deltaY = Math.cos(angle) * speed;
+
+        return [x + deltaX, y + deltaY];
     },
 
     // Inhalt des Canvas in eine Datei schreiben
@@ -58,11 +74,13 @@ const helpers = {
         a.click();
 
     },
+
     leadingZero(num, dec = 0) {
         let str = '00000000000000000';
         return (str + num).substr(-dec);
 
     },
+
     // Helper function to convert base64 image content to a blob
     base64ToBlob(base64, mime) {
         mime = mime || '';
@@ -83,6 +101,7 @@ const helpers = {
 
         return new Blob(byteArrays, { type: mime });
     }
+
 }
 
 export default helpers;
