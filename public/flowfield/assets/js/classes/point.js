@@ -11,10 +11,10 @@ class Point {
         this.angle = Math.random() * 2 * Math.PI;
         this.lines = [[[this.x, this.y]]];
         this.v = rnd(1 * 1000, 3 * 1000) / 1000;
-        this.maxLength = 50;
-        this.lineWidth = .2;
+        this.maxLength = rnd(50,100);
+        this.lineWidth = .3;
         this.hue = rnd(0,360);
-        this.angleAmp = 2;
+        this.angleAmp = 1.7;
     }
     update() {
         if (settings.noise[~~this.y] && settings.noise[~~this.y][~~this.x]) {

@@ -28,16 +28,17 @@ const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: false,
+        maxFiles: 10800,
+        saveFile: true,
         cSize: {
             x: ~~(1920 / 2),
             y: ~~(1040 / 2),
         },
         
-        noiseZoom: 70,
+        noiseZoom: 100,
         numPoints:20000,
         posZ : 0.1,
-        deltaZ : .3
+        deltaZ : .13
     })
 
     domMapping();

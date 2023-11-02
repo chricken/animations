@@ -11,16 +11,18 @@ const draw = {
         // console.clear();
         // console.log(settings.lines.length);
         // Ein Bild rendern
+        console.time()
         settings.counter++;
-
+        
         if (settings.counter % settings.res == 0) {
             draw.addLine()
         }
-
+        
         elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
-
+        
         settings.lines.forEach(line => line.update());
-
+        
+        console.timeEnd()
         // console.log(settings.counter);
         draw.animate();
     },

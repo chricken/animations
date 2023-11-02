@@ -24,7 +24,7 @@ router.post('/save_image', (req, res) => {
         if (err) res.json({ status: 'err', error: "Parsing Error" });
         else {
             files.file.forEach(file => {
-
+                // console.log(file);
                 fs.rename(
                     uploadDir + file.newFilename,
                     uploadDir + file.originalFilename,
