@@ -31,11 +31,11 @@ const init = () => {
         maxFiles: 10800,
         saveFile: true,
         cSize: {
-            x: ~~(1920 / 2),
-            y: ~~(1040 / 2),
+            x: ~~(1920 / 1.5),
+            y: ~~(1040 / 1.5),
         },
         
-        noiseZoom: 100,
+        noiseZoom: 150,
         numPoints:20000,
         posZ : 0.1,
         deltaZ : .13

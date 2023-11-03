@@ -8,13 +8,15 @@ class Point {
         let c = elements.c;
         this.x = Math.random() * c.width;
         this.y = Math.random() * c.height;
+        this.counter = 0;
         this.angle = Math.random() * 2 * Math.PI;
         this.lines = [[[this.x, this.y]]];
         this.v = rnd(1 * 1000, 3 * 1000) / 1000;
-        this.maxLength = rnd(50,100);
-        this.lineWidth = .3;
-        this.hue = rnd(0,360);
-        this.angleAmp = 1.7;
+        this.maxLength = rnd(30, 50);
+        this.lineWidth = .6;
+        this.hue = rnd(0, 360);
+        this.angleAmp = 1.9;
+        this.lifetime = rnd(200, 400);
     }
     update() {
         if (settings.noise[~~this.y] && settings.noise[~~this.y][~~this.x]) {
@@ -62,19 +64,20 @@ class Point {
     render() {
         let c = elements.c;
         let ctx = elements.ctx;
+        this.counter++;
 
         ctx.strokeStyle = `hsla(${this.hue},100%,50%,.5)`;
         ctx.beginPath();
         ctx.lineWidth = this.lineWidth;
         this.lines.forEach(line => {
-            if (line[0]) {
+            if (line[0] && this.counter < this.lifetime) {
                 ctx.moveTo(...line[0])
+                line.forEach(point => ctx.lineTo(...point));
             } else {
                 // console.log(this.lines);
                 settings.points = settings.points.filter(point => point != this);
                 settings.points.push(new Point());
             }
-            line.forEach(point => ctx.lineTo(...point));
         })
         ctx.stroke();
         // ctx.fillRect(this.x, this.y, 2, 2);
