@@ -21,7 +21,8 @@ const createRandom = () => {
                 t = p[j]; p[j] = p[j + 1]; p[j + 1] = t;
             }
             return p;
-        })()]);
+        })()
+    ]);
 }
 
 const init = () => {
@@ -34,11 +35,11 @@ const init = () => {
             x: ~~(1920 / 1),
             y: ~~(1040 / 1),
         },
-        maze:[],
-        numHorz: 20,
+        maze: [],
+        numHorz: 40,
         noiseZoom: 150,
-        posZ : 0.1,
-        deltaZ : .13
+        posZ: 0.1,
+        deltaZ: .13
     })
 
     domMapping();

@@ -4,12 +4,20 @@ import settings, { elements } from '/modules/settings.js';
 import { rnd, lead0, clamp } from '/modules/helpers.js';
 import noises, { Perlin } from '/modules/noises.js';
 import ajax from '/modules/ajax.js';
-import Square from './classes/square.js';
 
-class Field {
+class FieldMST {
     constructor(right, bottom) {
         this.right = right;
         this.bottom = bottom;
+    }
+}
+class FieldDFS {
+    constructor() {
+        this.visited = false;
+        this.top = false;
+        this.right = false;
+        this.bottom = false;
+        this.left = false;
     }
 }
 
@@ -51,7 +59,185 @@ const draw = {
         }
     },
 
-    createMaze() {
+    // Wände durchbrechen
+    touchField(x, y) {
+        // console.log(x, y);
+
+        // Intermediate
+        let maze = settings.maze;
+
+        maze[x][y].visited = true;
+
+        // Mögliche nächste Felder suchen
+        let possibleNextFields = [];
+
+        if (maze[x - 1] && !maze[x - 1][y].visited) possibleNextFields.push({
+            direction: 'left',
+            vertex: [x - 1, y]
+        });
+
+        if (maze[x + 1] && !maze[x + 1][y].visited) possibleNextFields.push({
+            direction: 'right',
+            vertex: [x + 1, y]
+        });
+
+        if (maze[x][y - 1] && !maze[x][y - 1].visited) possibleNextFields.push({
+            direction: 'top',
+            vertex: [x, y - 1]
+        });
+
+        if (maze[x][y + 1] && !maze[x][y + 1].visited) possibleNextFields.push({
+            direction: 'bottom',
+            vertex: [x, y + 1]
+        });
+
+        if (possibleNextFields.length > 1) {
+            settings.possibleBranches.push([x, y]);
+        }
+
+        if (possibleNextFields.length) {
+            // console.log(possibleNextFields);
+            let indexNext = rnd(0, possibleNextFields.length - 1);
+            let next = possibleNextFields[indexNext];
+
+            // Die Wand, durch die ich gehe, entfernen
+            let field = maze[x][y];
+            field[next.direction] = true;
+
+            // Die Wand, von der ich komme, entfernen
+            let nextField = maze[next.vertex[0]][next.vertex[1]];
+            switch (next.direction) {
+                case 'top':
+                    nextField.bottom = true;
+                    break;
+                case 'right':
+                    nextField.left = true;
+                    break;
+                case 'bottom':
+                    nextField.top = true;
+                    break;
+                case 'left':
+                    nextField.right = true;
+                    break;
+                default:
+                    break;
+            }
+
+            // console.log(indexNext);
+            // console.log(possibleNextFields[indexNext]);
+            draw.touchField(...next.vertex);
+        } else {
+            // Ziel bestimmen
+
+            settings.endVertex = [x, y];
+        }
+    },
+
+    createMazeDFS() {
+
+        settings.startVertex = [
+            rnd(0, settings.numHorz - 1),
+            rnd(0, settings.numVert - 1),
+        ]
+        settings.endVertex = []
+
+        // Felder für das Labyrinth
+        for (let x = 0; x < settings.numHorz; x++) {
+            settings.maze.push([]);
+            for (let y = 0; y < settings.numVert; y++) {
+                settings.maze[x].push(new FieldDFS());
+            }
+        }
+
+        draw.touchField(...settings.startVertex);
+
+        console.log(settings.possibleBranches);
+    },
+
+    renderMazeDFS() {
+        let c = elements.c;
+        let ctx = elements.ctx;
+
+        let width = c.width / settings.numHorz;
+
+        for (let x = 0; x < settings.numHorz; x++) {
+            for (let y = 0; y < settings.numVert; y++) {
+                let field = settings.maze[x][y];
+                ctx.fillStyle = '#0f0';
+
+                ctx.beginPath();
+                // Oben
+                if (!field.top) {
+                    ctx.roundRect(
+                        x * width,
+                        y * width,
+                        width,
+                        width / 10,
+                        2
+                    )
+                }
+
+                // Rechts
+                if (!field.right) {
+                    ctx.roundRect(
+                        (x + 1) * width,
+                        y * width,
+                        -width / 10,
+                        width,
+                        2
+                    )
+                }
+
+                // unten
+                if (!field.bottom) {
+                    ctx.roundRect(
+                        x * width,
+                        (y + 1) * width,
+                        width,
+                        -width / 10,
+                        2
+                    )
+                }
+
+                // Links
+                if (!field.left) {
+                    ctx.roundRect(
+                        x * width,
+                        y * width,
+                        width / 10,
+                        width,
+                        2
+                    )
+                }
+                ctx.fill()
+
+            }
+        }
+
+        // Startpunkt
+        ctx.fillStyle = '#ff0';
+        ctx.beginPath();
+        ctx.arc(
+            (settings.startVertex[0] + .5) * width,
+            (settings.startVertex[1] + .5) * width,
+            width / 2.5,
+            0, 2 * Math.PI
+        )
+        ctx.fill();
+
+        // Endpunkt
+        ctx.fillStyle = '#f00';
+        ctx.beginPath();
+        ctx.arc(
+            (settings.endVertex[0] + .5) * width,
+            (settings.endVertex[1] + .5) * width,
+            width / 2.5,
+            0, 2 * Math.PI
+        )
+        ctx.fill();
+    },
+
+    createMazeMST() {
         settings.widthPath = ~~(elements.c.width / settings.numHorz);
 
         // Weights, die an die Wände verteilt werden.
@@ -72,7 +258,7 @@ const draw = {
         }
         console.log(settings.maze);
     },
-    renderMaze() {
+    renderMazeMST() {
         let c = elements.c;
         let ctx = elements.ctx;
 
@@ -122,10 +308,12 @@ const draw = {
         // Wird initial einmal aufgerufen
         settings.counter = 0;
         settings.numVert = ~~(settings.numHorz / elements.c.width * elements.c.height);
+        settings.maze = [];
+        settings.possibleBranches = [];
 
         // settings.perlin = new Perlin(settings.p);
-        draw.createMaze();
-        draw.renderMaze();
+        draw.createMazeDFS();
+        draw.renderMazeDFS();
 
         // draw.step();
     }
