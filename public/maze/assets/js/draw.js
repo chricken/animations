@@ -23,8 +23,68 @@ class FieldDFS {
 
 const draw = {
     step() {
+        let c = elements.c;
+        let ctx = elements.ctx;
+
         // Ein Bild rendern
         settings.counter++;
+        let width = c.width / settings.numHorz;
+
+        let imgData = elements.ctx.getImageData(0, 0, c.width, c.height);
+
+        // Dieses Array wird mit den neuen zu füllenden Pixeln gefüllt und ersetzt nachher das alter Array mit zu füllenden Pixeln
+        const newFillPx = [];
+
+        // Über die aktuellen zu füllenden Pixel iterieren und füllen sowie die neuen zu füllenden Pixel finden
+        for (let i = 0; i < settings.fillPx.length; i++) {
+            let x = settings.fillPx[i][0];
+            x *= width;
+            x += width / 2;
+
+            let y = settings.fillPx[i][1];
+            y *= width;
+            y += width / 2;
+
+            console.log(x, y);
+
+            // Index des neu zu füllenden Pixels
+            let index = (x + (y * c.width)) * 4;
+            imgData.data[index] = 255;
+            imgData.data[index + 1] = 255;
+            imgData.data[index + 2] = 255;
+            imgData.data[index + 3] = 255;
+
+            // Benachbarte ungefüllte Pixel finden
+            // Oben
+            if (y > 0) {
+                let index = (x + (y - 1 * c.width)) * 4;
+                // Statt eines if-Statement
+                // Alfa-Kanal nutzen um zu sehen, ob das Feld schon gefüllt ist
+                ((imgData[index + 3]) < 1) || newFillPx.push([x, y - 1]);
+            }
+
+            // Unten
+            if (y < c.height - 1) {
+                let index = (x + (y + 1 * c.width)) * 4;
+                ((imgData[index + 3]) < 1) || newFillPx.push([x, y + 1]);
+            }
+
+            // Links
+            if (x > 0) {
+                let index = ((x - 1) + (y * c.width)) * 4;
+                ((imgData[index + 3]) < 1) || newFillPx.push([x - 1, y]);
+            }
+
+            // Rechts
+            if (x < c.width - 2) {
+                let index = ((x + 1) + (y * c.width)) * 4;
+                ((imgData[index + 3]) < 1) || newFillPx.push([x + 1, y]);
+            }
+
+        }
+        console.log(newFillPx);
+
+        ctx.putImageData(imgData, 0, 0);
 
         // Noise neu füllen
         // draw.drawNoise();
@@ -32,13 +92,9 @@ const draw = {
         // Noise verschieben
         // settings.posZ += settings.deltaZ;
 
-        elements.ctx.fillStyle = 'hsla(0,0%,100%,.01)';
-        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
-        // elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
 
-        settings.points.forEach(point => point.update());
 
-        draw.animate();
+        // draw.animate();
     },
 
     animate() {
@@ -59,16 +115,10 @@ const draw = {
         }
     },
 
-    // Wände durchbrechen
-    touchField(x, y) {
-        // console.log(x, y);
-
+    checkPossibleNextFields(x, y) {
         // Intermediate
         let maze = settings.maze;
 
-        maze[x][y].visited = true;
-
-        // Mögliche nächste Felder suchen
         let possibleNextFields = [];
 
         if (maze[x - 1] && !maze[x - 1][y].visited) possibleNextFields.push({
@@ -90,6 +140,22 @@ const draw = {
             direction: 'bottom',
             vertex: [x, y + 1]
         });
+
+        return possibleNextFields;
+    },
+
+    // Wände durchbrechen
+    touchField(x, y) {
+        // console.log(x, y);
+
+        // Intermediate
+        let maze = settings.maze;
+
+        maze[x][y].visited = true;
+
+
+        // Mögliche nächste Felder suchen
+        let possibleNextFields = draw.checkPossibleNextFields(x, y);
 
         if (possibleNextFields.length > 1) {
             settings.possibleBranches.push([x, y]);
@@ -127,10 +193,24 @@ const draw = {
             // console.log(possibleNextFields[indexNext]);
             draw.touchField(...next.vertex);
         } else {
+            // console.log(settings.possibleBranches);
             // Ziel bestimmen
-
+            draw.startNextBranch();
             settings.endVertex = [x, y];
+            // console.log(settings.endVertex);
         }
+    },
+
+    startNextBranch() {
+        // Alle Wege nachträglich auf mögliche Pfade prüfen
+        settings.possibleBranches = settings.possibleBranches.filter(branch => {
+            return draw.checkPossibleNextFields(...branch).length > 0;
+        })
+        let start = settings.possibleBranches[rnd(0, settings.possibleBranches.length - 1)];
+        if (start) {
+            draw.touchField(...start);
+        }
+        // console.log('Start', start);
     },
 
     createMazeDFS() {
@@ -151,7 +231,6 @@ const draw = {
 
         draw.touchField(...settings.startVertex);
 
-        console.log(settings.possibleBranches);
     },
 
     renderMazeDFS() {
@@ -159,6 +238,7 @@ const draw = {
         let ctx = elements.ctx;
 
         let width = c.width / settings.numHorz;
+        let border = width / 5;
 
         for (let x = 0; x < settings.numHorz; x++) {
             for (let y = 0; y < settings.numVert; y++) {
@@ -169,44 +249,44 @@ const draw = {
                 // Oben
                 if (!field.top) {
                     ctx.roundRect(
-                        x * width,
-                        y * width,
-                        width,
-                        width / 10,
-                        2
+                        x * width - (border / 2),
+                        y * width - (border / 2),
+                        width + border,
+                        border,
+                        border / 2
                     )
                 }
 
                 // Rechts
                 if (!field.right) {
                     ctx.roundRect(
-                        (x + 1) * width,
-                        y * width,
-                        -width / 10,
-                        width,
-                        2
+                        (x + 1) * width - (border / 2),
+                        y * width - (border / 2),
+                        border,
+                        width + border,
+                        border / 2
                     )
                 }
 
                 // unten
                 if (!field.bottom) {
                     ctx.roundRect(
-                        x * width,
-                        (y + 1) * width,
-                        width,
-                        -width / 10,
-                        2
+                        x * width - (border / 2),
+                        (y + 1) * width - (border / 2),
+                        width + border,
+                        border,
+                        border / 2
                     )
                 }
 
                 // Links
                 if (!field.left) {
                     ctx.roundRect(
-                        x * width,
-                        y * width,
-                        width / 10,
-                        width,
-                        2
+                        x * width - (border / 2),
+                        y * width - (border / 2),
+                        border,
+                        width + border,
+                        border / 2
                     )
                 }
                 ctx.fill()
@@ -215,7 +295,8 @@ const draw = {
         }
 
         // Startpunkt
-        ctx.fillStyle = '#ff0';
+
+        ctx.fillStyle = '#220';
         ctx.beginPath();
         ctx.arc(
             (settings.startVertex[0] + .5) * width,
@@ -224,6 +305,7 @@ const draw = {
             0, 2 * Math.PI
         )
         ctx.fill();
+
 
         // Endpunkt
         ctx.fillStyle = '#f00';
@@ -237,51 +319,6 @@ const draw = {
         ctx.fill();
     },
 
-    createMazeMST() {
-        settings.widthPath = ~~(elements.c.width / settings.numHorz);
-
-        // Weights, die an die Wände verteilt werden.
-        // Braucht doppelt so viele Weights wie Felder, da jedes Feld zwei Ausgänge (benötigen je eine weight) hat
-        let weights = [...new Array(settings.numHorz * settings.numVert * 2)].map((val, index) => index);
-        // console.log(weights.toString());
-
-        // Minimum Spanning Tree nach: https://www.baeldung.com/cs/maze-generation
-        // Array mit allen Feldern des Labyrints.
-        // In dem Array werden Objekte gespeichert mit den Zufallswerten für die rechte und die untere Wand. Dadurch ergeben sich amme Wände.
-        // Die letzen Felder werden werden nicht ausgeführt.
-        for (let i = 0; i < (settings.numHorz * settings.numVert); i++) {
-            let field = new Field(
-                weights.splice(rnd(0, weights.length - 1), 1)[0],
-                weights.splice(rnd(0, weights.length - 1), 1)[0],
-            )
-            settings.maze.push(field);
-        }
-        console.log(settings.maze);
-    },
-    renderMazeMST() {
-        let c = elements.c;
-        let ctx = elements.ctx;
-
-        // ctx.beginPath();
-        ctx.fillStyle = '#fff';
-        for (let y = 0; y < settings.numVert; y++) {
-            for (let x = 0; x < settings.numHorz; x++) {
-                console.log(x * settings.widthPath, y * settings.widthPath);
-                ctx.font = '10px arial'
-                ctx.fillText(
-                    settings.maze[x + (y * settings.numHorz)].right,
-                    (x + 1) * settings.widthPath,
-                    (y + 1) * settings.widthPath - (settings.widthPath / 2),
-                );
-                ctx.fillText(
-                    settings.maze[x + (y * settings.numHorz)].bottom,
-                    (x + 1) * settings.widthPath - (settings.widthPath / 2),
-                    (y + 1) * settings.widthPath,
-                );
-            }
-        }
-
-    },
     drawNoise() {
 
         let c = elements.c;
@@ -304,6 +341,7 @@ const draw = {
         ctx.putImageData(img, 0, 0);
         */
     },
+
     init() {
         // Wird initial einmal aufgerufen
         settings.counter = 0;
@@ -314,8 +352,10 @@ const draw = {
         // settings.perlin = new Perlin(settings.p);
         draw.createMazeDFS();
         draw.renderMazeDFS();
+        console.log(settings.startVertex);
+        settings.fillPx.push(settings.startVertex);
+        draw.step()
 
-        // draw.step();
     }
 }
 

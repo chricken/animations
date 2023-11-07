@@ -36,7 +36,8 @@ const init = () => {
             y: ~~(1040 / 1),
         },
         maze: [],
-        numHorz: 40,
+        fillPx:[],
+        numHorz: 20,
         noiseZoom: 150,
         posZ: 0.1,
         deltaZ: .13
