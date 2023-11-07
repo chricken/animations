@@ -30,14 +30,14 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
+        saveFile: false,
         cSize: {
             x: ~~(1920 / 1),
             y: ~~(1040 / 1),
         },
         maze: [],
         fillPx:[],
-        numHorz: 20,
+        numHorz: 50,
         noiseZoom: 150,
         posZ: 0.1,
         deltaZ: .13
