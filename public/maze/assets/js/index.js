@@ -4,14 +4,14 @@ import settings, { elements } from '../../../modules/settings.js';
 import fillApp from './fill_app.js';
 import { rnd, lead0, clamp } from '/modules/helpers.js';
 import draw from './draw.js';
+import noises, { Perlin } from '../../../modules/noises.js';
 
 const domMapping = () => {
     elements.main = document.body;
 }
 
 const createRandom = () => {
-
-    settings.p = new Uint8Array([
+    return new Uint8Array([
         ...[...new Array(6)].map(() => rnd(1, 254)),
         ...(() => {
             let p = [], i;
@@ -31,14 +31,15 @@ const init = () => {
         fileNo: 0,
         maxFiles: 10800,
         saveFile: false,
+        perlin: new Perlin(createRandom()),
         cSize: {
             x: ~~(1920 / 1),
             y: ~~(1040 / 1),
         },
         maze: [],
-        fillPx:[],
+        fillPx: [],
         numHorz: 50,
-        noiseZoom: 150,
+        noiseZoom: .01,
         posZ: 0.1,
         deltaZ: .13
     })

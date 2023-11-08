@@ -32,39 +32,29 @@ const draw = {
 
         let imgData = elements.ctx.getImageData(0, 0, c.width, c.height);
 
-        // Dieses Array wird mit den neuen zu füllenden Pixeln gefüllt und ersetzt nachher das alter Array mit zu füllenden Pixeln
-        // const newFillPx = [];
+        // Dieses Set wird mit den neuen zu füllenden Pixeln gefüllt und ersetzt nachher das alte Array mit zu füllenden Pixeln
+        // Ein Set, weil es sonst zu sehr vielen Dupletten kommt
         const newFillPx = new Set();
-        // console.log(' ');
-        // console.log('fillPx', settings.fillPx);
+        // console.log(settings.noise);
+        // console.log(settings.fillPx);
         // Über die aktuellen zu füllenden Pixel iterieren und füllen sowie die neuen zu füllenden Pixel finden
         for (let i = 0; i < settings.fillPx.length; i++) {
             let x = settings.fillPx[i][0];
-            // x *= width;
-            // x += width / 2;
-
             let y = settings.fillPx[i][1];
-            // y *= width;
-            // y += width / 2;
-
-            // console.log(x, y);
 
             // Index des neu zu füllenden Pixels
             let index = (x + (y * c.width)) * 4;
-            imgData.data[index] = 255;
-            imgData.data[index + 1] = 255;
-            imgData.data[index + 2] = 255;
+            imgData.data[index] = ~~(settings.noise[y][x] * 255);
+            imgData.data[index + 1] = ~~(settings.noise[y][x] * 255);
+            imgData.data[index + 2] = ~~(settings.noise[y][x] * 255);
             imgData.data[index + 3] = 255;
 
             // Benachbarte ungefüllte Pixel finden
             // Oben
             if (y > 0) {
                 let index = (x + ((y - 1) * c.width)) * 4;
-                // console.log(x, y - 1, imgData.data[index + 3]);
-                // Statt eines if-Statement
                 // Alfa-Kanal nutzen um zu sehen, ob das Feld schon gefüllt ist
                 if ((imgData.data[index + 3]) < 1) {
-                    // newFillPx.push([x, y - 1]);
                     newFillPx.add(index);
                 }
             }
@@ -72,9 +62,7 @@ const draw = {
             // Unten
             if (y < c.height - 1) {
                 let index = (x + ((y + 1) * c.width)) * 4;
-                // console.log(x, y + 1, imgData.data[index + 3]);
                 if ((imgData.data[index + 3]) < 1) {
-                    // newFillPx.push([x, y + 1]);
                     newFillPx.add(index);
                 }
             }
@@ -82,9 +70,7 @@ const draw = {
             // Links
             if (x > 0) {
                 let index = ((x - 1) + (y * c.width)) * 4;
-                // console.log(x - 1, y, imgData.data[index + 3]);
                 if ((imgData.data[index + 3]) < 1) {
-                    // newFillPx.push([x - 1, y]);
                     newFillPx.add(index);
                 }
             }
@@ -92,40 +78,25 @@ const draw = {
             // Rechts
             if (x < c.width - 2) {
                 let index = ((x + 1) + (y * c.width)) * 4;
-                // console.log(x + 1, y, imgData.data[index + 3]);
                 if ((imgData.data[index + 3]) < 1) {
-                    // newFillPx.push([x + 1, y]);
                     newFillPx.add(index);
                 }
             }
 
         }
 
-        // console.log(newFillPx);
-
         ctx.putImageData(imgData, 0, 0);
 
         settings.fillPx = [...newFillPx].map(index => {
             index /= 4;
-            /*
-            console.log(index);
-            console.log([
-                index % c.width,
-                ~~(index / c.width)
-            ]);
-            */
             return [
                 index % c.width,
                 ~~(index / c.width)
             ]
         });
-        // Noise neu füllen
-        // draw.drawNoise();
 
         // Noise verschieben
         // settings.posZ += settings.deltaZ;
-
-
 
         draw.animate();
     },
@@ -222,15 +193,11 @@ const draw = {
                     break;
             }
 
-            // console.log(indexNext);
-            // console.log(possibleNextFields[indexNext]);
             draw.touchField(...next.vertex);
         } else {
-            // console.log(settings.possibleBranches);
             // Ziel bestimmen
             draw.startNextBranch();
             settings.endVertex = [x, y];
-            // console.log(settings.endVertex);
         }
     },
 
@@ -243,7 +210,6 @@ const draw = {
         if (start) {
             draw.touchField(...start);
         }
-        // console.log('Start', start);
     },
 
     createMazeDFS() {
@@ -354,27 +320,38 @@ const draw = {
         */
     },
 
-    drawNoise() {
+    fillNoise() {
 
         let c = elements.c;
         let ctx = elements.ctx;
 
-        /*
-        let img = ctx.getImageData(0, 0, c.width, c.height);
-
-        // Flowmap füllen
-        for (let i = 0; i < img.data.length; i += 4) {
-            // Flowmap im Canvas darstellen
-            img.data[i] = ~~(value * 255);
-            img.data[i + 1] = ~~(value * 255);
-            img.data[i + 2] = ~~(value * 255);
-            img.data[i + 3] = 255;
+        let noise = [];
+        for (let y = 0; y < c.height; y++) {
+            noise.push([]);
+            for (let x = 0; x < c.width; x++) {
+                let value = settings.perlin.noise(
+                    x * settings.noiseZoom,
+                    y * settings.noiseZoom,
+                    settings.posZ * settings.noiseZoom,
+                );
+                let value2 = settings.perlin.noise(
+                    x * settings.noiseZoom * Math.PI * 2,
+                    y * settings.noiseZoom * Math.PI * 2,
+                    settings.posZ * settings.noiseZoom * Math.PI * 2,
+                );
+                // Value ist -1 -> 1
+                value += 1;
+                value2 += 1;
+                // Value ist 0 -> 2
+                value /= 2;
+                value2 /= 2;
+                // Zusammenführen
+                value = (value + value2) / 2;
+                noise[y].push(value)
+            }
         }
+        return noise;
 
-        // console.log(settings.noise);
-
-        ctx.putImageData(img, 0, 0);
-        */
     },
 
     init() {
@@ -383,16 +360,17 @@ const draw = {
         settings.numVert = ~~(settings.numHorz / elements.c.width * elements.c.height);
         settings.maze = [];
         settings.possibleBranches = [];
+        settings.noise = draw.fillNoise();
 
         // settings.perlin = new Perlin(settings.p);
         draw.createMazeDFS();
         draw.renderMazeDFS();
-        // console.log(settings.startVertex);
+        console.log(settings.startVertex);
         settings.fillPx.push(settings.startVertex.map(point => {
             let width = elements.c.width / settings.numHorz;
             point *= width;
             point += width / 2;
-            return point;
+            return ~~point;
         }));
         draw.step()
 
