@@ -41,7 +41,8 @@ const init = () => {
         numHorz: 50,
         noiseZoom: .01,
         posZ: 0.1,
-        deltaZ: .13
+        deltaZ: .3,
+        wachstum:.018
     })
 
     domMapping();

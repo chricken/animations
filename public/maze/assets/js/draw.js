@@ -1,7 +1,7 @@
 'use strict';
 
 import settings, { elements } from '/modules/settings.js';
-import { rnd, lead0, clamp } from '/modules/helpers.js';
+import helpers, { rnd, lead0, clamp } from '/modules/helpers.js';
 import noises, { Perlin } from '/modules/noises.js';
 import ajax from '/modules/ajax.js';
 
@@ -25,6 +25,11 @@ const draw = {
     step() {
         let c = elements.c;
         let ctx = elements.ctx;
+        // ctx.clearRect(0, 0, c.width, c.height);
+
+        // Noise verschieben
+        settings.posZ += settings.deltaZ;
+        // settings.noise = draw.fillNoise();
 
         // Ein Bild rendern
         settings.counter++;
@@ -39,15 +44,29 @@ const draw = {
         // console.log(settings.fillPx);
         // Über die aktuellen zu füllenden Pixel iterieren und füllen sowie die neuen zu füllenden Pixel finden
         for (let i = 0; i < settings.fillPx.length; i++) {
-            let x = settings.fillPx[i][0];
-            let y = settings.fillPx[i][1];
+            let px = settings.fillPx[i];
+            let x = px.vertex[0];
+            let y = px.vertex[1];
 
             // Index des neu zu füllenden Pixels
             let index = (x + (y * c.width)) * 4;
-            imgData.data[index] = ~~(settings.noise[y][x] * 255);
-            imgData.data[index + 1] = ~~(settings.noise[y][x] * 255);
-            imgData.data[index + 2] = ~~(settings.noise[y][x] * 255);
-            imgData.data[index + 3] = 255;
+            let value = draw.noisePx(x, y);
+            px.value += value * settings.wachstum;
+
+
+            if (px.value > 1) {
+                let rgb = helpers.HSLToRGB(~~(px.value * 30) % 360, 100, 50);
+                // console.log(rgb);
+                imgData.data[index] = rgb.r;
+                imgData.data[index + 1] = rgb.g;
+                imgData.data[index + 2] = rgb.b;
+                // imgData.data[index] =  255;
+                // imgData.data[index + 1] = 255;
+                // imgData.data[index + 2] = 255;
+                imgData.data[index + 3] = 255;
+            } else {
+                imgData.data[index + 3] = 1;
+            }
 
             // Benachbarte ungefüllte Pixel finden
             // Oben
@@ -87,13 +106,16 @@ const draw = {
 
         ctx.putImageData(imgData, 0, 0);
 
-        settings.fillPx = [...newFillPx].map(index => {
+        settings.fillPx.push(...[...newFillPx].map(index => {
             index /= 4;
-            return [
-                index % c.width,
-                ~~(index / c.width)
-            ]
-        });
+            return {
+                vertex: [
+                    index % c.width,
+                    ~~(index / c.width)
+                ],
+                value: 0
+            }
+        }));
 
         // Noise verschieben
         // settings.posZ += settings.deltaZ;
@@ -242,7 +264,7 @@ const draw = {
         for (let x = 0; x < settings.numHorz; x++) {
             for (let y = 0; y < settings.numVert; y++) {
                 let field = settings.maze[x][y];
-                ctx.fillStyle = '#0f0';
+                ctx.fillStyle = '#000';
 
                 ctx.beginPath();
                 // Oben
@@ -354,6 +376,33 @@ const draw = {
 
     },
 
+    noisePx(x, y) {
+        let c = elements.c;
+        let ctx = elements.ctx;
+
+        let value = settings.perlin.noise(
+            x * settings.noiseZoom,
+            y * settings.noiseZoom,
+            settings.posZ * settings.noiseZoom,
+        );
+        let value2 = settings.perlin.noise(
+            x * settings.noiseZoom * Math.PI * 2,
+            y * settings.noiseZoom * Math.PI * 2,
+            settings.posZ * settings.noiseZoom * Math.PI * 2,
+        );
+        // Value ist -1 -> 1
+        value += 1;
+        value2 += 1;
+        // Value ist 0 -> 2
+        value /= 2;
+        value2 /= 2;
+        // Zusammenführen
+        value = (value + value2) / 2;
+
+        return value;
+
+    },
+
     init() {
         // Wird initial einmal aufgerufen
         settings.counter = 0;
@@ -366,12 +415,15 @@ const draw = {
         draw.createMazeDFS();
         draw.renderMazeDFS();
         console.log(settings.startVertex);
-        settings.fillPx.push(settings.startVertex.map(point => {
-            let width = elements.c.width / settings.numHorz;
-            point *= width;
-            point += width / 2;
-            return ~~point;
-        }));
+        settings.fillPx.push({
+            vertex: settings.startVertex.map(point => {
+                let width = elements.c.width / settings.numHorz;
+                point *= width;
+                point += width / 2;
+                return ~~point;
+            }),
+            value: 0
+        });
         draw.step()
 
     }
