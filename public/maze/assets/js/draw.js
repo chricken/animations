@@ -55,7 +55,14 @@ const draw = {
 
 
             if (px.value > 1) {
-                let rgb = helpers.HSLToRGB(~~(px.value * 30) % 360, 100, 50);
+                // HSL in RGB für diesen Pixel umwandeln
+                // let rgb = helpers.HSLToRGB(~~(px.value * 30) % 360, 100, 50);
+                px.hue = (px.hue + 360) % 360;
+                let rgb = helpers.HSLToRGB(~~px.hue, 100, 50);
+
+                // Farbwert ändern
+                // px.hue += rnd(-settings.deltaHue * 1000, settings.deltaHue * 1000) / 1000;
+                px.hue += settings.deltaHue;
                 // console.log(rgb);
                 imgData.data[index] = rgb.r;
                 imgData.data[index + 1] = rgb.g;
@@ -113,7 +120,8 @@ const draw = {
                     index % c.width,
                     ~~(index / c.width)
                 ],
-                value: 0
+                value: 0,
+                hue: settings.hue
             }
         }));
 

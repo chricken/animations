@@ -30,11 +30,11 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: false,
+        saveFile: true,
         perlin: new Perlin(createRandom()),
         cSize: {
-            x: ~~(1920 / 1),
-            y: ~~(1040 / 1),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
         maze: [],
         fillPx: [],
@@ -42,7 +42,9 @@ const init = () => {
         noiseZoom: .01,
         posZ: 0.1,
         deltaZ: .3,
-        wachstum:.018
+        wachstum: .018,
+        hue: 0,
+        deltaHue: 1,
     })
 
     domMapping();
