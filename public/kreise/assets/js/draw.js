@@ -3,80 +3,17 @@
 import settings, { elements } from '/modules/settings.js';
 import { rnd, lead0, clamp } from '/modules/helpers.js';
 import ajax from '/modules/ajax.js';
-import Point from './classes/point.js';
-import Attractor from './classes/attractor.js';
+import Kreise from './classes/kreise.js';
 
 const draw = {
     yStart: 0,
     yEnd: 0,
 
 
-    renderCurves() {
-        let c = elements.c;
-        let ctx = c.getContext('2d');
-
-
-        ctx.lineWidth = settings.lineWidth;
-        ctx.strokeStyle = '#fff'
-
-        ctx.beginPath();
-
-        let start = [c.width / 6, c.height / 2]
-        ctx.moveTo(...start);
-
-        let sp1a = [c.width / 5, c.height / 4];
-        let sp2a = [c.width / 4 * 4, c.height / 4];
-        let end = [c.width / 4 * 3, c.height / 3]
-        ctx.bezierCurveTo(
-            ...sp1a,
-            ...sp2a,
-            ...end
-        )
-
-        let sp1b = [
-            end[0] + (end[0] - sp2a[0]),
-            end[1] + (end[1] - sp2a[1]),
-        ]
-        let sp2b = [
-            start[0] + (start[0] - sp1a[0]),
-            start[1] + (start[1] - sp1a[1]),
-        ]
-        ctx.bezierCurveTo(
-            ...sp1b,
-            ...sp2b,
-            ...start
-        )
-
-        ctx.stroke()
-
-        // console.clear();
-        // console.log(settings.curves.length);
-
-        /*
-        for (let i = 0; i < settings.curves.length; i++) {
-
-            const curve = settings.curves[i];
-
-            ctx.strokeStyle = curve.color;
-
-            ctx.beginPath();
-
-          
-            // ctx.moveTo(...curve.startPoint);
-            ctx.moveTo(...curve.beziers[0].p1);
-
-            for (let b = 1; b < curve.beziers.length-1; b++) {
-                ctx.bezierCurveTo(
-                    ...curve.beziers[b].p1,
-                    ...curve.beziers[b].p2,
-                    ...curve.beziers[b].endPoint
-                );
-            }
-
-            ctx.stroke()
-
-        }
-        */
+    step() {
+        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+        settings.kreise.update()
+        draw.animate();
     },
     addCurve() {
         // Eine curve besteht aus mehreren Bezier-Kurven mit je zwei Stützpunkten und einem Endpunkt
@@ -114,6 +51,7 @@ const draw = {
         // curve.beziers[curve.beziers.length - 1].endPoint = [elements.c.width, draw.yEnd];
         // console.log(curve);
     },
+    /*
     step() {
         // console.clear()
         // console.log(settings);
@@ -158,6 +96,7 @@ const draw = {
         // console.log(settings.counter);
         draw.animate();
     },
+    */
     animate() {
         if (settings.saveFile) {
             if (settings.fileNo < settings.maxFiles) {
@@ -178,16 +117,10 @@ const draw = {
         settings.counter = 0;
         elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
 
-        settings.points = [...new Array(settings.numPoints)].map(() => new Point())
-        settings.attractors = [...new Array(settings.numAttractors)].map(() => new Attractor())
+        settings.kreise = new Kreise();
 
-        console.log(settings);
-
-        draw.yStart = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
-        draw.yEnd = rnd(elements.c.height / 3, elements.c.height / 3 * 2);
-
-        // draw.animate();
-        draw.renderCurves()
+        draw.animate();
+        // draw.renderCurves()
     }
 }
 
