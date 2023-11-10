@@ -7,7 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['maze'];
+const projectsToOpn = ['kreise'];
 // const projectsToOpn = ['linescape'];
 
 server.use(express.static('public'));
