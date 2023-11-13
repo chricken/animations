@@ -14,7 +14,7 @@ const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: true,
+        saveFile: false,
         cSize: {
             x: ~~(1920 / 1),
             y: ~~(1040 / 1),
@@ -23,11 +23,11 @@ const init = () => {
         curves: [],
 
         // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 40,
+        // numPoints: 40,
 
         numAttractors: 3,
 
-        maxCurves: 30,
+        maxCurves: 50,
         numIterations: 30,
         lineWidth: 1,
         opacity: .1,

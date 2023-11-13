@@ -134,7 +134,19 @@ const helpers = {
         return { r, g, b };
 
 
-    }
+    },
+
+    angleToXY(vertex, distance, angle) {
+        // sin a = gk / hyp
+        // gk = sin a * hyp
+        let x = Math.sin(angle / 180 * Math.PI) * distance;
+        x = vertex[0] + x;
+
+        let y = Math.cos(angle / 180 * Math.PI) * distance;
+        y = vertex[1] + y;
+
+        return [x, y];
+    },
 
 }
 
