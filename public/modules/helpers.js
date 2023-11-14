@@ -136,14 +136,14 @@ const helpers = {
 
     },
 
-    angleToXY(vertex, distance, angle) {
+    angleToXY(distance, angle, centerX, centerY) {
         // sin a = gk / hyp
         // gk = sin a * hyp
         let x = Math.sin(angle / 180 * Math.PI) * distance;
-        x = vertex[0] + x;
+        x = centerX + x;
 
         let y = Math.cos(angle / 180 * Math.PI) * distance;
-        y = vertex[1] + y;
+        y = centerY + y;
 
         return [x, y];
     },

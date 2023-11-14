@@ -3,10 +3,16 @@ import helpers, { rnd, lead0, clamp } from '/modules/helpers.js';
 import noises, { Perlin } from '/modules/noises.js';
 
 class Kreis {
-    constructor(start, sp1a, sp2a, end, sp1b, sp2b, hue) {
-        Object.assign(this, { start, sp1a, sp2a, end, sp1b, sp2b, hue })
+    constructor(start, sp1a, sp2a, end, hue) {
+
+        let c = elements.c;
+        let ctx = c.getContext('2d');
+
+        Object.assign(this, { start, sp1a, sp2a, end,  hue })
+
+
         // this.rgb = helpers.HSLToRGB(hue, 100, 50);
-        this.lineWidth = .4;
+        this.lineWidth = .1;
     }
 
     update() {
@@ -21,10 +27,11 @@ class Kreis {
         ctx.lineWidth = this.lineWidth;
         ctx.strokeStyle = `hsl(${this.hue},100%,50%)`;
 
-        let start = helpers.angleToXY([c.width / 6, c.height / 2], ...this.start);
-        let sp1a = helpers.angleToXY([c.width / 5, 0], ...this.sp1a);
-        let sp2a = helpers.angleToXY([c.width / 4 * 3, 0], ...this.sp2a);
-        let end = helpers.angleToXY([c.width / 6 * 5, c.height / 2], ...this.end);
+        // Anhand von Abstand und Winkel den wirklichen Punkt berechnen
+        let start = helpers.angleToXY(...this.start);
+        let sp1a = helpers.angleToXY( ...this.sp1a);
+        let sp2a = helpers.angleToXY( ...this.sp2a);
+        let end = helpers.angleToXY( ...this.end);
 
         ctx.beginPath();
 

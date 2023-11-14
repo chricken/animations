@@ -51,52 +51,7 @@ const draw = {
         // curve.beziers[curve.beziers.length - 1].endPoint = [elements.c.width, draw.yEnd];
         // console.log(curve);
     },
-    /*
-    step() {
-        // console.clear()
-        // console.log(settings);
-
-        // elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
-        if (settings.fileNo % settings.fadeAfterFrames == 0) {
-            elements.ctx.fillStyle = 'rgba(0,0,0,.05)'
-            elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
-        }
-
-        for (let i = 0; i < settings.numIterations; i++) {
-
-            settings.points.forEach(point => point.draw());
-            settings.attractors.forEach(attr => attr.draw());
-
-            settings.counter++
-
-            // draw.renderCurve();
-            draw.addCurve();
-            let delta = settings.deltaPosStartEnd;
-            // draw.yStart += rnd(-delta * 1000, delta * 1000) / 1000;
-            // draw.yEnd += rnd(-delta * 1000, delta * 1000) / 1000;
-
-            draw.yStart += settings.deltaPosStart;
-            if (draw.yStart > elements.c.height || draw.yStart < 0)
-                settings.deltaPosStart *= -1
-
-            draw.yEnd += settings.deltaPosEnd;
-            if (draw.yEnd > elements.c.height || draw.yEnd < 0)
-                settings.deltaPosEnd *= -1
-
-            // Farben 
-            settings.hue += rnd(-settings.deltaHue * 100, settings.deltaHue * 100) / 100;
-        }
-        // Falls die Anzahl Kurven erreicht wurde, entferne die ersten paar wieder
-        if (settings.curves.length > settings.maxCurves) {
-            let numToKill = settings.curves.length - settings.maxCurves;
-            settings.curves.splice(0, numToKill);
-        }
-        draw.renderCurves();
-
-        // console.log(settings.counter);
-        draw.animate();
-    },
-    */
+    
     animate() {
         if (settings.saveFile) {
             if (settings.fileNo < settings.maxFiles) {
