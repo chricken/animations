@@ -85,7 +85,7 @@ const helpers = {
     base64ToBlob(base64, mime) {
         mime = mime || '';
         let sliceSize = 1024;
-        let byteChars = window.atob(base64);
+        let byteChars = window.atob(base64); 
         let byteArrays = [];
 
         for (let offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {

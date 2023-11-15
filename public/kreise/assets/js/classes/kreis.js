@@ -8,11 +8,11 @@ class Kreis {
         let c = elements.c;
         let ctx = c.getContext('2d');
 
-        Object.assign(this, { start, sp1a, sp2a, end,  hue })
+        Object.assign(this, { start, sp1a, sp2a, end, hue })
 
 
         // this.rgb = helpers.HSLToRGB(hue, 100, 50);
-        this.lineWidth = .1;
+        this.lineWidth = 4;
     }
 
     update() {
@@ -25,13 +25,28 @@ class Kreis {
         let ctx = c.getContext('2d');
 
         ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = `hsl(${this.hue},100%,50%)`;
+        ctx.strokeStyle = `hsla(${this.hue},100%,50%,.1)`;
+        // ctx.strokeStyle = `hsl(${this.hue},100%,50%)`;
 
         // Anhand von Abstand und Winkel den wirklichen Punkt berechnen
         let start = helpers.angleToXY(...this.start);
-        let sp1a = helpers.angleToXY( ...this.sp1a);
-        let sp2a = helpers.angleToXY( ...this.sp2a);
-        let end = helpers.angleToXY( ...this.end);
+        let sp1a = helpers.angleToXY(...this.sp1a);
+        let sp2a = helpers.angleToXY(...this.sp2a);
+        let end = helpers.angleToXY(...this.end);
+
+        /* Punkte zeichnen
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(...start, 2, 2);
+        ctx.fillRect(...sp1a, 2, 2);
+        ctx.fillRect(...sp2a, 2, 2);
+        ctx.fillRect(...end, 2, 2);
+
+        ctx.fillStyle = '#0f0';
+        ctx.fillRect(this.start[2], this.start[3], 2, 2);
+        ctx.fillRect(this.sp1a[2], this.sp1a[3], 2, 2);
+        ctx.fillRect(this.sp2a[2], this.sp2a[3], 2, 2);
+        ctx.fillRect(this.end[2], this.end[3], 2, 2);
+        */
 
         ctx.beginPath();
 

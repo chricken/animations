@@ -9,7 +9,6 @@ const draw = {
     yStart: 0,
     yEnd: 0,
 
-
     step() {
         elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
         settings.kreise.update()
@@ -55,7 +54,7 @@ const draw = {
     animate() {
         if (settings.saveFile) {
             if (settings.fileNo < settings.maxFiles) {
-                ajax.saveCanvasToServer(elements.c, `image_${lead0(settings.fileNo, 6)}.png`).then(
+                ajax.saveCanvasToServer(elements.c, `image_${lead0(settings.fileNo, 6)}.jpg`).then(
                     () => {
                         settings.fileNo++;
                         requestAnimationFrame(draw.step)

@@ -32,6 +32,28 @@ const ajax = {
             // resolve();
         })
     },
+
+    saveCanvasToServerJPG(c, fileName) {
+        return new Promise((resolve, reject) => {
+
+            // Get the canvas data as a URL
+            const cDataURL = c.toDataURL('image/jpeg');
+
+            const formData = new FormData();
+            formData.append('file', cDataURL, fileName);
+
+            fetch('/save_image', {
+                method: 'POST',
+                body: formData
+            }).then(
+                res => res.json()
+            ).then(
+                resolve
+            ).catch(
+                reject
+            );
+        })
+    },
 }
 
 export default ajax;

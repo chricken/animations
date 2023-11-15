@@ -14,7 +14,7 @@ const init = () => {
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
-        saveFile: true,
+        saveFile: false,
         cSize: {
             x: ~~(1920 / 1),
             y: ~~(1040 / 1),
