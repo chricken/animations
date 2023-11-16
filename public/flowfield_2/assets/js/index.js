@@ -29,16 +29,18 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: false,
+        saveFile: true,
         cSize: {
-            x: ~~(1920 / 1.5),
-            y: ~~(1040 / 1.5),
+            x: ~~(1920 / 1),
+            y: ~~(1040 / 1),
         },
         
         noiseZoom: 150,
         numPoints:30000,
         posZ : 0.1,
-        deltaZ : 2.5
+        deltaZ : 2.5,
+        hue: 0,
+        deltaHue: .002,
     })
 
     domMapping();

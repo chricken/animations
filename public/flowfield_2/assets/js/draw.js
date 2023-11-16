@@ -52,7 +52,7 @@ const draw = {
         // Globales Array mit der Flow-Map
         settings.noise = new Array(c.height);
         settings.noise = [...settings.noise].map(() => new Array(c.width));
-        
+
         // Flowmap füllen
         for (let i = 0; i < img.data.length; i += 4) {
             let index = i / 4;
@@ -63,8 +63,8 @@ const draw = {
                 x / settings.noiseZoom,
                 y / settings.noiseZoom,
                 z / settings.noiseZoom
-                ) + 1) / 2
-                
+            ) + 1) / 2
+
             settings.noise[y][x] = value
             /*
             // Flowmap im Canvas darstellen
@@ -74,9 +74,9 @@ const draw = {
             img.data[i + 3] = 255;
             */
         }
-        
+
         // console.log(settings.noise);
-        
+
         // ctx.putImageData(img, 0, 0);
     },
     init() {
@@ -85,7 +85,10 @@ const draw = {
 
         settings.perlin = new Perlin(settings.p);
 
-        settings.points = [...new Array(settings.numPoints)].map(() => new Point());
+        settings.points = [...new Array(settings.numPoints)].map(() => {
+            
+            return new Point();
+        });
 
         draw.step();
     }

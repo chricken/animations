@@ -4,7 +4,7 @@ import settings, { elements } from '/modules/settings.js';
 import helpers, { rnd } from '/modules/helpers.js';
 
 class Point {
-    constructor() {
+    constructor(hue) {
         let c = elements.c;
         this.x = Math.random() * c.width;
         this.y = Math.random() * c.height;
@@ -14,9 +14,12 @@ class Point {
         this.v = rnd(1 * 1000, 3 * 1000) / 1000;
         this.maxLength = rnd(30, 50);
         this.lineWidth = .6;
-        this.hue = rnd(0, 360);
+        this.hue = ~~(settings.hue % 360);// rnd(0, 360);
         this.angleAmp = 14;
         this.lifetime = rnd(200, 400);
+
+        settings.hue += settings.deltaHue
+        // console.log(this.hue);
     }
     update() {
         if (settings.noise[~~this.y] && settings.noise[~~this.y][~~this.x]) {
