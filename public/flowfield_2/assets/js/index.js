@@ -29,14 +29,14 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
+        saveFile: false,
         cSize: {
-            x: ~~(1920 / 1),
-            y: ~~(1040 / 1),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
         
         noiseZoom: 150,
-        numPoints:30000,
+        numPoints:10000,
         posZ : 0.1,
         deltaZ : 2.5,
         hue: 0,

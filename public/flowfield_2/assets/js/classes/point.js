@@ -13,7 +13,7 @@ class Point {
         this.lines = [[[this.x, this.y]]];
         this.v = rnd(1 * 1000, 3 * 1000) / 1000;
         this.maxLength = rnd(30, 50);
-        this.lineWidth = .6;
+        this.lineWidth = 2;
         this.hue = ~~(settings.hue % 360);// rnd(0, 360);
         this.angleAmp = 14;
         this.lifetime = rnd(200, 400);

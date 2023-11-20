@@ -16,10 +16,12 @@ const init = () => {
         maxFiles: 10800,
         saveFile: false,
         cSize: {
-            x: ~~(1920 / 3),
-            y: ~~(1040 / 3),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
-        numPoints: 300,
+        numPoints: 10,
+        numOrbiters: 5000,
+        thresholdDistance: 30
     })
 
     domMapping();
