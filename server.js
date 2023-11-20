@@ -7,7 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['flowfield_2'];
+const projectsToOpn = ['orbiter'];
 // const projectsToOpn = ['linescape'];
 
 server.use(express.static('public'));
