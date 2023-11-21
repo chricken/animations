@@ -15,12 +15,13 @@ const init = () => {
         fileNo: 0,
         maxFiles: 10800,
         saveFile: false,
+        animate:true,
         cSize: {
             x: ~~(1920 / 2),
             y: ~~(1040 / 2),
         },
-        numPoints: 10,
-        numOrbiters: 5000,
+        numPoints: 30,
+        numOrbiters: 30000,
         thresholdDistance: 30
     })
 

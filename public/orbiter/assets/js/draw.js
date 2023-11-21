@@ -13,16 +13,18 @@ const draw = {
         settings.counter++;
 
 
-        // elements.ctx.fillStyle = 'hsla(0,0%,100%,.01)';
-        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+        
+        elements.ctx.fillStyle = 'hsla(0,0%,0%,.02)';
+        elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
+        // elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
 
         // settings.points.forEach(point => point.update());
-        settings.orbiters.forEach(orbiter => orbiter.update());
         settings.points.forEach(point => point.update());
+        settings.orbiters.forEach(orbiter => orbiter.update());
 
         // draw.fillDistanceMap();
 
-        // draw.animate();
+        if (settings.animate) draw.animate();
     },
     animate() {
         // Speichern und rendervorgang erneuern
@@ -44,14 +46,14 @@ const draw = {
     init() {
         // Wird initial einmal aufgerufen
         settings.counter = 0;
-        settings.orbiters =[...new Array(settings.numOrbiters)].map(() => {
+        settings.orbiters = [...new Array(settings.numOrbiters)].map(() => {
             return new Orbiter();
         })
-                
-        settings.points =[...new Array(settings.numPoints)].map(() => {
+
+        settings.points = [...new Array(settings.numPoints)].map(() => {
             return new Point();
         })
-                
+
 
         draw.step();
     }
