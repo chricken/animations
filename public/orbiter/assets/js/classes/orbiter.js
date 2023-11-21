@@ -7,53 +7,64 @@ class Orbiter {
     constructor() {
         this.x = rnd(0, settings.cSize.x);
         this.y = rnd(0, settings.cSize.y);
-        this.v = rnd(-.8 * 1000, .8 * 1000) / 1000;
+        this.v = rnd(.2 * 1000, .4 * 1000) / 1000;
+        if (Math.random() > .5) this.v *= -1;
         this.angle = rnd(0, 360) / 180 * Math.PI;
-        this.hue = rnd(0, 50);
+        this.hue = settings.hue;
         this.deltaHue = 1;
         this.line = [];
-        this.lineMaxLength = 20;
-        this.lineWidth = .5;
+        this.lineMaxLength = 150;
+        this.lineWidth = 1;
+        this.traegheit = 8e-2;
+        this.killMe = false;
+        settings.hue += rnd(-settings.deltaHue * 100, settings.deltaHue * 200) / 100;
     }
 
     update() {
         this.findNearestPoint();
 
-        let deltaX = Math.sin(this.angle) * this.v;
-        let deltaY = Math.cos(this.angle) * this.v;
-        this.x += deltaX;
-        this.y += deltaY;
-        this.line.push([this.x, this.y]);
-        if (this.line.length > this.lineMaxLength) this.line.splice(0, this.line.length - this.lineMaxLength);
-        this.hue += rnd(-this.deltaHue * 100, this.deltaHue * 100) / 100;
-        /*
-        this.rotierePunkt(
-            this.x, this.y,
-            this.nearest.x, this.nearest.y,
-            1 / this.distance * this.v
-        );
-        */
+        if (this.killMe) {
+            this.line.splice(0, 1);
+            if (this.line.length <= 0) {
+                settings.orbiters = settings.orbiters.filter(o => o != this);
+                settings.orbiters.push(new Orbiter());
+            }
+        } else {
+            let deltaX = Math.cos(this.angle) * this.v;
+            let deltaY = Math.sin(this.angle) * this.v;
+
+            this.x += deltaX;
+            this.y += deltaY;
+            let deltaAngle = this.angle - this.angleToPoint;
+            if (deltaAngle > Math.PI) {
+                deltaAngle -= 2 * Math.PI;
+            } else if (deltaAngle < -Math.PI) {
+                deltaAngle += 2 * Math.PI;
+            }
+            this.deltaAngle = deltaAngle
+            this.angle -= deltaAngle / this.distance ** 1.5 / this.traegheit
+
+            // this.updateNewton();
+            this.line.push([this.x, this.y]);
+            if (this.line.length > this.lineMaxLength) this.line.splice(0, this.line.length - this.lineMaxLength);
+            this.hue += rnd(-this.deltaHue * 100, this.deltaHue * 100) / 100;
+            this.checkborders()
+        }
+
         this.render();
+
+        if (this.distance < 5) {
+            this.killMe = true;
+        }
     }
-    rotierePunkt(px, py, cx, cy, winkel) {
-        // Umwandlung des Winkels von Grad in Radiant
-        // winkel = winkel * Math.PI / 180.0;
 
-        // Verschieben des Ursprungs zum Mittelpunkt der Rotation
-        let dx = px - cx;
-        let dy = py - cy;
-
-        // Durchführung der Rotation
-        let dxRotiert = dx * Math.cos(winkel) - dy * Math.sin(winkel);
-        let dyRotiert = dx * Math.sin(winkel) + dy * Math.cos(winkel);
-
-        // Verschieben des Ursprungs zurück zum ursprünglichen Punkt
-        let pxRotiert = dxRotiert + cx;
-        let pyRotiert = dyRotiert + cy;
-
-        this.x = pxRotiert;
-        this.y = pyRotiert;
+    checkborders() {
+        if (this.x > settings.cSize.x) this.killMe = true
+        if (this.x < 0) this.killMe = true
+        if (this.y > settings.cSize.y) this.killMe = true
+        if (this.y < 0) this.killMe = true
     }
+
     findNearestPoint() {
         this.nearest = settings.points.reduce((nearest, point) => {
             point.distance = helpers.pythagorasPoints(this, point);
@@ -65,7 +76,7 @@ class Orbiter {
         }, {
             distance: Infinity
         })
-
+        // console.log(this.nearest);
         // this.hue = this.nearest.hue;
         this.light = ~~(50 / this.nearest.distance * settings.thresholdDistance);
         this.distance = this.nearest.distance;
@@ -76,8 +87,9 @@ class Orbiter {
         // atan ist der richtige Weg
         let deltaX = this.nearest.x - this.x;
         let deltaY = this.nearest.y - this.y;
-        this.angle = Math.atan2(deltaY, deltaX);
-
+        this.angleToPoint = Math.atan2(deltaY, deltaX);
+        this.angleToPoint += (Math.PI * 2);
+        this.angleToPoint %= (Math.PI * 2);
         // console.log((this.y - nearest.y), nearest.distance);
 
     }
@@ -90,17 +102,24 @@ class Orbiter {
         console.log(`hsl(${this.hue},${Math.abs(this.angle / Math.PI * 180) / 3.6}%,${this.light}%)`);
         */
         // ctx.fillStyle = `hsl(${this.hue},${Math.max((this.angle / Math.PI * 180) / 1.6, 30)}%,${Math.max(80, this.light)}%)`;
-        ctx.strokeStyle = `hsl(${this.hue},100%,${80, this.light}%)`;
+        ctx.strokeStyle = `hsl(${this.hue},100%,${Math.max(80, this.light)}%)`;
         ctx.lineWidth = this.lineWidth;
         ctx.beginPath();
-        ctx.moveTo(...this.line[0]);
-        for (let i = 1; i < this.line.length; i++) {
-            ctx.lineTo(...this.line[i]);
+        if (this.line.length) {
+            ctx.moveTo(...this.line[0]);
+            for (let i = 1; i < this.line.length; i++) {
+                ctx.lineTo(...this.line[i]);
+            }
         }
 
         ctx.stroke();
         // ctx.fillRect(this.x, this.y, 1, 1);
-        // ctx.fillText(this.angle * 180 /Math.PI, this.x, this.y)
+        let output = this.angle.toFixed(2) +
+            ' | ' +
+            this.angleToPoint.toFixed(2) +
+            ' | ' +
+            this.deltaAngle.toFixed(2);
+        // ctx.fillText(output, this.x, this.y)
     }
 }
 

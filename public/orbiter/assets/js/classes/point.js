@@ -7,10 +7,12 @@ class Point {
     constructor() {
         this.x = rnd(0, settings.cSize.x);
         this.y = rnd(0, settings.cSize.y);
-        this.v = rnd(-0.6 * 1000, .6 * 1000) / 1000;
+        this.v = rnd(.2 * 1000, .5 * 1000) / 1000;
+        if (Math.random() > .5) this.v *= -1;
         this.angle = rnd(0, 360) / 180 * Math.PI;
         this.hue = rnd(0, 360);
         this.collisionPadding = settings.cSize.x / 10;
+        this.mass = 10e4;
     }
 
     update() {
@@ -37,8 +39,13 @@ class Point {
         let c = elements.c;
         let ctx = elements.ctx;
         // console.log(this);
-        ctx.fillStyle = `hsl(${this.hue},100%,50%)`;
-        // ctx.fillRect(this.x, this.y, 8, 8);
+        ctx.fillStyle = `hsl(${this.hue},50%,70%)`;
+        // ctx.fillRect(this.x, this.y, 5, 5);
+        ctx.strokeStyle = 'hsl(0,50%,50%)'
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+        ctx.stroke();
     }
 }
 

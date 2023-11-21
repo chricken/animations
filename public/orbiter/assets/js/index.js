@@ -14,15 +14,17 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
-        animate:true,
+        saveFile: false,
+        animate: true,
         cSize: {
-            x: ~~(1920 / 1.5),
-            y: ~~(1040 / 1.5),
+            x: ~~(1920 / 2),
+            y: ~~(1040 / 2),
         },
-        numPoints: 100,
-        numOrbiters: 50000,
-        thresholdDistance: 30
+        numPoints: 20,
+        numOrbiters: 10000,
+        thresholdDistance: 30,
+        hue: 120,
+        deltaHue: .01,
     })
 
     domMapping();

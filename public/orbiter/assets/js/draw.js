@@ -27,6 +27,8 @@ const draw = {
     animate() {
         // Speichern und rendervorgang erneuern
         settings.fileNo++;
+        console.clear();
+        console.log(settings.fileNo);
         if (settings.saveFile) {
             if (settings.fileNo < settings.maxFiles) {
                 ajax.saveCanvasToServer(elements.c, `image_${lead0(settings.fileNo, 6)}.png`).then(
