@@ -14,14 +14,14 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: false,
+        saveFile: true,
         animate:true,
         cSize: {
-            x: ~~(1920 / 2),
-            y: ~~(1040 / 2),
+            x: ~~(1920 / 1.5),
+            y: ~~(1040 / 1.5),
         },
-        numPoints: 30,
-        numOrbiters: 30000,
+        numPoints: 100,
+        numOrbiters: 50000,
         thresholdDistance: 30
     })
 

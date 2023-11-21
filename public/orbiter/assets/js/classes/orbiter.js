@@ -7,9 +7,13 @@ class Orbiter {
     constructor() {
         this.x = rnd(0, settings.cSize.x);
         this.y = rnd(0, settings.cSize.y);
-        this.v = rnd(-.3 * 1000, .3 * 1000) / 1000;
+        this.v = rnd(-.8 * 1000, .8 * 1000) / 1000;
         this.angle = rnd(0, 360) / 180 * Math.PI;
-        this.hue = 240;
+        this.hue = rnd(0, 50);
+        this.deltaHue = 1;
+        this.line = [];
+        this.lineMaxLength = 20;
+        this.lineWidth = .5;
     }
 
     update() {
@@ -19,6 +23,9 @@ class Orbiter {
         let deltaY = Math.cos(this.angle) * this.v;
         this.x += deltaX;
         this.y += deltaY;
+        this.line.push([this.x, this.y]);
+        if (this.line.length > this.lineMaxLength) this.line.splice(0, this.line.length - this.lineMaxLength);
+        this.hue += rnd(-this.deltaHue * 100, this.deltaHue * 100) / 100;
         /*
         this.rotierePunkt(
             this.x, this.y,
@@ -59,7 +66,7 @@ class Orbiter {
             distance: Infinity
         })
 
-        this.hue = this.nearest.hue;
+        // this.hue = this.nearest.hue;
         this.light = ~~(50 / this.nearest.distance * settings.thresholdDistance);
         this.distance = this.nearest.distance;
         // sin a = gk/hyp
@@ -83,8 +90,16 @@ class Orbiter {
         console.log(`hsl(${this.hue},${Math.abs(this.angle / Math.PI * 180) / 3.6}%,${this.light}%)`);
         */
         // ctx.fillStyle = `hsl(${this.hue},${Math.max((this.angle / Math.PI * 180) / 1.6, 30)}%,${Math.max(80, this.light)}%)`;
-        ctx.fillStyle = `hsl(${this.hue},100%,${80, this.light}%)`;
-        ctx.fillRect(this.x, this.y, 1, 1);
+        ctx.strokeStyle = `hsl(${this.hue},100%,${80, this.light}%)`;
+        ctx.lineWidth = this.lineWidth;
+        ctx.beginPath();
+        ctx.moveTo(...this.line[0]);
+        for (let i = 1; i < this.line.length; i++) {
+            ctx.lineTo(...this.line[i]);
+        }
+
+        ctx.stroke();
+        // ctx.fillRect(this.x, this.y, 1, 1);
         // ctx.fillText(this.angle * 180 /Math.PI, this.x, this.y)
     }
 }

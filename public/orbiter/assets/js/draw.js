@@ -12,11 +12,9 @@ const draw = {
         // Ein Bild rendern
         settings.counter++;
 
-
-        
-        elements.ctx.fillStyle = 'hsla(0,0%,0%,.02)';
-        elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
-        // elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
+        // elements.ctx.fillStyle = 'hsla(0,0%,0%,.02)';
+        // elements.ctx.fillRect(0, 0, elements.c.width, elements.c.height);
+        elements.ctx.clearRect(0, 0, elements.c.width, elements.c.height);
 
         // settings.points.forEach(point => point.update());
         settings.points.forEach(point => point.update());

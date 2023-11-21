@@ -7,7 +7,7 @@ class Point {
     constructor() {
         this.x = rnd(0, settings.cSize.x);
         this.y = rnd(0, settings.cSize.y);
-        this.v = rnd(-0.2 * 1000, .2 * 1000) / 1000;
+        this.v = rnd(-0.6 * 1000, .6 * 1000) / 1000;
         this.angle = rnd(0, 360) / 180 * Math.PI;
         this.hue = rnd(0, 360);
         this.collisionPadding = settings.cSize.x / 10;
