@@ -7,8 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['orbiter'];
-// const projectsToOpn = ['linescape'];
+const projectsToOpn = ['draw_stuff'];
 
 server.use(express.static('public'));
 server.use((routes));

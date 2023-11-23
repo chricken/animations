@@ -31,7 +31,7 @@ const helpers = {
     },
 
     // Pythagoras - a² = b² + c²
-    pythagorasPoints(point1, point2) {
+    pythagorasPoints(point1, point2, maxDistance = Infinity) {
         let a = 0, b = 0;
         if (point1.x) {
             a = point1.x - point2.x;
@@ -42,9 +42,9 @@ const helpers = {
             b = point1.posY - point2.posY;
         }
         if (a == 0 && b == 0) {
-            return Infinity;
+            return maxDistance;
         } else {
-            return Math.sqrt(a * a + b * b);
+            return Math.abs(Math.sqrt(a * a + b * b));
         }
 
     },
@@ -85,7 +85,7 @@ const helpers = {
     base64ToBlob(base64, mime) {
         mime = mime || '';
         let sliceSize = 1024;
-        let byteChars = window.atob(base64); 
+        let byteChars = window.atob(base64);
         let byteArrays = [];
 
         for (let offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
