@@ -23,7 +23,7 @@ class Attractor {
         // let div = Math.sin(divisor / 180 * Math.PI) / 3 + 1.5;
         let ctx = elements.ctx;
 
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = '#fff';
         ctx.fillRect(
             this.x - this.size / 2,
             this.y - this.size / 2,

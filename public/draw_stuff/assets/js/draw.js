@@ -28,16 +28,17 @@ const draw = {
         );
 
         for (let i = 0; i < settings.numRoots; i++) {
-            ctx.rotate((Math.PI * 2) / settings.numRoots);
+            ctx.save()
+            ctx.rotate((Math.PI * 2) / settings.numRoots * i);
+            ctx.translate(...settings.rootDistance);
 
             draw.branch(0);
+            ctx.restore()
         }
         ctx.restore()
     },
 
     branch(level) {
-
-
         const c = elements.c;
         const ctx = elements.ctx;
         if (level > settings.maxLevel) return;
@@ -47,7 +48,7 @@ const draw = {
         ctx.lineCap = 'round'
         ctx.shadowColor = 'rgba(0,0,0,.7)';
         ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0; 
+        ctx.shadowOffsetY = 0;
         ctx.shadowBlur = 2;
         // ctx.globalCompositeOperation = 'overlay'
 
@@ -56,22 +57,26 @@ const draw = {
         ctx.lineTo(settings.size, 0);
         ctx.stroke();
 
-        for (let i = 0; i < settings.numBranches; i++) {
+        for (let i = 0; i <= settings.numBranches; i++) {
             let scale = settings.scale * (1 + i / 5)
+            // Linke Branches
             ctx.save()
             // ctx.translate(settings.size * settings.posBranch, 0);
-            ctx.translate(settings.size - (settings.size / settings.numBranches * i), 0);
-            let rndRot = rnd(-settings.randomRotation*100, settings.randomRotation*100)/100
+            let offset = settings.offsetBranch * settings.size;
+            let size = settings.size - offset;
+            ctx.translate(settings.size - (size / settings.numBranches * i), 0);
+            let rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
             ctx.rotate(settings.rotation * (1 + i / 2) - rndRot);
-
+            
             
             ctx.scale(scale, scale);
             draw.branch(level + 1);
             ctx.restore()
             
+            // Rechte Branches
             ctx.save()
-            ctx.translate(settings.size - (settings.size / settings.numBranches * i), 0);
-            rndRot = rnd(-settings.randomRotation*100, settings.randomRotation*100)/100
+            ctx.translate(settings.size - (size / settings.numBranches * i), 0);
+            rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
             ctx.rotate(-settings.rotation * (1 + i / 2) - rndRot);
 
             ctx.scale(scale, scale);

@@ -24,7 +24,7 @@ const init = () => {
         curves: [],
 
         // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 40,
+        numPoints: 6,
 
         numAttractors: 3,
 

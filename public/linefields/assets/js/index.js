@@ -40,7 +40,7 @@ const init = () => {
         lines: [],
 
         // Muss durch 2 teilbar sein, weil 2 SP je Bezierkurve
-        numPoints: 1500,
+        numPoints: 10,
 
         res: 10,    //Frames pro Line
         addX: 1,

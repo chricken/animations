@@ -30,7 +30,7 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
+        saveFile: false,
         perlin: new Perlin(createRandom()),
         cSize: {
             x: ~~(1920 / 2),
