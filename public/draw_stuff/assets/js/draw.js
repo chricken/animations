@@ -44,7 +44,7 @@ const draw = {
         if (level > settings.maxLevel) return;
 
         ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 15;
+        ctx.lineWidth = settings.lineWidth;
         ctx.lineCap = 'round'
         ctx.shadowColor = 'rgba(0,0,0,.7)';
         ctx.shadowOffsetX = 0;
@@ -64,20 +64,26 @@ const draw = {
             // ctx.translate(settings.size * settings.posBranch, 0);
             let offset = settings.offsetBranch * settings.size;
             let size = settings.size - offset;
-            ctx.translate(settings.size - (size / settings.numBranches * i), 0);
+            ctx.translate(
+                settings.size - (size / settings.numBranches * i),
+                settings.branchDistance
+            );
             let rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
-            ctx.rotate(settings.rotation * (1 + i / 2) - rndRot);
-            
-            
+            ctx.rotate(settings.rotation * (1 + i / settings.rotationMod) - rndRot);
+
+
             ctx.scale(scale, scale);
             draw.branch(level + 1);
             ctx.restore()
-            
+
             // Rechte Branches
             ctx.save()
-            ctx.translate(settings.size - (size / settings.numBranches * i), 0);
+            ctx.translate(
+                settings.size - (size / settings.numBranches * i),
+                -settings.branchDistance
+            );
             rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
-            ctx.rotate(-settings.rotation * (1 + i / 2) - rndRot);
+            ctx.rotate(-settings.rotation * (1 + i / settings.rotationMod) - rndRot);
 
             ctx.scale(scale, scale);
             draw.branch(level + 1);

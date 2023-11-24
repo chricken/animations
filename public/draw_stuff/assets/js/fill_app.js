@@ -22,6 +22,58 @@ const fillApp = () => {
         parent: elements.main,
     })
 
+    // Schieber
+    components.range({
+        parent: containerUI,
+        legend: 'Size',
+        min: 1,
+        max: settings.cSize.x,
+        value: settings.size,
+        callback(evt) {
+            settings.size = evt.target.value;
+            draw.step();
+        }
+    })
+
+    // Linienbreite
+    components.range({
+        parent: containerUI,
+        legend: 'Line Width',
+        min: .2,
+        max: settings.lineWidth*5,
+        value: settings.lineWidth,
+        callback(evt) {
+            settings.lineWidth = evt.target.value;
+            draw.step();
+        }
+    })
+
+    // Maximale Iterationstiefe
+    components.range({
+        parent: containerUI,
+        legend: 'maxLevel',
+        min: 1,
+        max: settings.maxLevel*3,
+        value: settings.maxLevel,
+        callback(evt) {
+            settings.maxLevel = evt.target.value;
+            draw.step();
+        }
+    })
+
+    // Anzahl der Zweige
+    components.range({
+        parent: containerUI,
+        legend: 'Num Branches',
+        min: 1,
+        max: settings.numBranches*3,
+        value: settings.numBranches,
+        callback(evt) {
+            settings.numBranches = evt.target.value;            
+            draw.step();
+        }
+    })
+
 
     // Linie
     create({
