@@ -40,3 +40,16 @@ span.legend {
 input[type="range"]{
     width: 500px;
 }
+
+.ui .container {
+    position: relative;
+    display: inline-block;
+    width:40%;
+}
+
+.ui input[type="range"]{
+    width: 350px;
+}
+.ui input[type="text"]{
+    width: 50px;
+}

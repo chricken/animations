@@ -43,26 +43,43 @@ const draw = {
         const ctx = elements.ctx;
         if (level > settings.maxLevel) return;
 
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = 'rgba(255,255,255,.7)';
         ctx.lineWidth = settings.lineWidth;
         ctx.lineCap = 'round'
-        ctx.shadowColor = 'rgba(0,0,0,.7)';
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 2;
-        // ctx.globalCompositeOperation = 'overlay'
+        if (settings.showShadows) {
+            ctx.shadowColor = 'rgba(0,0,0,.7)';
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowBlur = 2;
+        } else {
+            ctx.shadowColor = 'rgba(0,0,0,0)';
+            ctx.shadowBlur = 0;
+        }
+        ctx.save()
+        for (let i = 0; i < settings.numBranches; i++) {
+            // ctx.globalCompositeOperation = 'overlay'
+            let offset = settings.offsetBranch * settings.size;
+            let segmentSize = settings.size;
 
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(settings.size, 0);
-        ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(i * segmentSize, 0);
+            ctx.lineTo((i + 1) * segmentSize, 0);
+            /*
+            ctx.strokeRect((i + 1) * segmentSize, segmentSize, 5, 5)
 
-        for (let i = 0; i <= settings.numBranches; i++) {
-            let scale = settings.scale * (1 + i / 5)
+            ctx.quadraticCurveTo(
+                (i + 1) * segmentSize, segmentSize,
+                (i + 1) * segmentSize, 0
+            );
+                */
+            ctx.stroke();
+
+            let scale = settings.scale * (1 + (i * settings.scaleMod));
+            // let scale = settings.scale ;
+
             // Linke Branches
             ctx.save()
             // ctx.translate(settings.size * settings.posBranch, 0);
-            let offset = settings.offsetBranch * settings.size;
             let size = settings.size - offset;
             ctx.translate(
                 settings.size - (size / settings.numBranches * i),
@@ -76,19 +93,29 @@ const draw = {
             draw.branch(level + 1);
             ctx.restore()
 
-            // Rechte Branches
-            ctx.save()
+            if (settings.mirror) {
+                // Rechte Branches
+                ctx.save()
+                ctx.translate(
+                    settings.size - (size / settings.numBranches * i),
+                    -settings.branchDistance
+                );
+                rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
+                ctx.rotate(-settings.rotation * (1 + i / settings.rotationMod) - rndRot);
+
+                ctx.scale(scale, scale);
+                draw.branch(level + 1);
+                ctx.restore();
+            }
+            /*
             ctx.translate(
                 settings.size - (size / settings.numBranches * i),
-                -settings.branchDistance
+                settings.branchDistance
             );
-            rndRot = rnd(-settings.randomRotation * 100, settings.randomRotation * 100) / 100
-            ctx.rotate(-settings.rotation * (1 + i / settings.rotationMod) - rndRot);
-
-            ctx.scale(scale, scale);
-            draw.branch(level + 1);
-            ctx.restore();
+            */
+            ctx.rotate(settings.bow);
         }
+        ctx.restore();
     },
 
     animate() {

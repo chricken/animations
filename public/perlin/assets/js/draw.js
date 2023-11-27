@@ -6,7 +6,7 @@ import dom from '../../../modules/dom.js';
 import noises, { Perlin } from '../../../modules/noises.js';
 import ajax from '../../../modules/ajax.js';
 
-let zoom = 100;
+let zoom = 300;
 let speedX = .5, speedY = 1, speedZ = 2;
 let fileNo = 0;
 
@@ -21,19 +21,24 @@ const draw = {
         let imgData = ctx.getImageData(0, 0, c.width, c.height);
         let data = imgData.data;
         for (let i = 0; i < data.length; i += 4) {
+            
             let x = ((i / 4) % imgData.width) + settings.x;
             let y = Math.floor((i / 4) / imgData.width) + settings.y;
             let z = settings.z;
+
             [x, y, z] = [x / zoom, y / zoom, z / zoom];
+
             let valR = perlin.noise(x, y, z);
             // console.log(perlin.noise(x, y, z));
             let valG = perlin.noise(x * .5, y, z);
             let valB = perlin.noise(y, x, z);
+
             // Wert (-1 -> 1) in (0 - 255) umwandeln
             [valR, valG, valB] = [valR, valG, valB].map(val => (val + 1) * 128 - 1);
+           
             data[i] = valR;
-            data[i + 1] = valG;
-            data[i + 2] = valB;
+            data[i + 1] = valR;
+            data[i + 2] = valR;
             data[i + 3] = 255;
         }
         // console.log(imgData);
@@ -43,6 +48,7 @@ const draw = {
         settings.y += speedY;
         settings.z += speedZ;
 
+        /*
         ajax.saveCanvasToServer(c, `image_${lead0(fileNo, 6)}.png`).then(
             () => {
                 fileNo++;
@@ -51,7 +57,7 @@ const draw = {
         ).catch(
             console.warn
         )
-
+        */
 
     }
 }

@@ -44,6 +44,7 @@ const components = {
             }
         })
         if (checked) cb.checked = true;
+        return cb;
     },
 
     inputFile({ parent, legend, callback }) {
@@ -106,9 +107,13 @@ const components = {
             type: 'input',
             parent: container,
             attr: {
-                value
+                value,
+                type:'text',
             },
             listeners: {
+                input(){
+                    inputText.value = inputText.value.replaceAll(',', '.');
+                },
                 change(evt) {
                     inputText.value = eval(inputText.value);
                     inputRange.value = inputText.value;

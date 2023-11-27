@@ -7,7 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['draw_stuff'];
+const projectsToOpn = ['perlin'];
 
 server.use(express.static('public'));
 server.use((routes));
