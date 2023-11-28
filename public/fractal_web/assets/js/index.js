@@ -29,19 +29,22 @@ const createRandom = () => {
 const init = () => {
     createRandom();
 
+    let divisorRes = 1.5;
+
     Object.assign(settings, {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: false,
+        saveFile: true,
         animate: true,
         perlin: new Perlin(settings.p),
         hue: 0,
-        deltaHue: .1,
-        numPoints: 1e4,
+        deltaHue: .0003,
+        numPoints: 3e5,
+        maxHaarLength: .03,  // Anteil an Canvasbreite
         cSize: {
-            x: ~~(1920 / 4),
-            y: ~~(1040 / 4),
+            x: ~~(1920 / divisorRes),
+            y: ~~(1040 / divisorRes),
         },
         zoom: {
             r: 10,
@@ -49,7 +52,7 @@ const init = () => {
             b: 35
         },
         threshold: {
-            r: 0,
+            r: .2,
             g: .25,
             b: .25,
         },
@@ -61,7 +64,7 @@ const init = () => {
         speed: {
             x: .010,
             y: .010,
-            z: .010
+            z: .10
         }
     })
 

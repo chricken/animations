@@ -16,8 +16,6 @@ const draw = {
         const perlin = settings.perlin;
 
         let ctx = c.getContext('2d');
-        // let imgData = ctx.getImageData(0, 0, c.width, c.height);
-        // let data = imgData.data;
 
         for (let posY = 0; posY < settings.cSize.y; posY++) {
             for (let posX = 0; posX < settings.cSize.x; posX++) {
@@ -31,36 +29,34 @@ const draw = {
                     y / settings.cSize.x * settings.zoom.r,
                     z / settings.cSize.x * settings.zoom.r
                 );
+
                 let valG = perlin.noise(...[
                     x / settings.cSize.x * settings.zoom.g,
                     y / settings.cSize.x * settings.zoom.g,
                     z / settings.cSize.x * settings.zoom.g
                 ]);
+
                 let valB = perlin.noise(...[
                     x / settings.cSize.x * settings.zoom.b,
                     y / settings.cSize.x * settings.zoom.b,
                     z / settings.cSize.x * settings.zoom.b
                 ]);
+
                 let val = valR > settings.threshold.r;
-                val = val || (valR + valG > settings.threshold.g) ? 255 : 0;
+                val = {
+                    show: val || (valR + valG > settings.threshold.g) ? 255 : 0,
+                    val: valR + valG,
+                };
 
-                // console.log(settings.px, y, x);
+                settings.px[posY][posX] = val; 
 
-                settings.px[posY][posX] = val;
-                /* 
-                data[i] = val;
-                data[i + 1] = val;
-                data[i + 2] = val;
-                data[i + 3] = 255;
-                 */
             }
         }
-        // ctx.putImageData(imgData, 0, 0);
 
         ctx.clearRect(0, 0, settings.cSize.x, settings.cSize.y);
 
         for (let i = 0; i < settings.points.length; i++) {
-            settings.points[i].render();
+            settings.points[i].update();
         }
 
         settings.pos.x += settings.speed.x;
