@@ -7,7 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['perlin'];
+const projectsToOpn = ['fractal_web'];
 
 server.use(express.static('public'));
 server.use((routes));

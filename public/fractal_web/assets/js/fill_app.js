@@ -22,6 +22,62 @@ const fillApp = () => {
         parent: elements.main,
     })
 
+    // ZOOM
+    components.range({
+        parent: containerUI,
+        legend: 'zoom R',
+        min: 0,
+        max: settings.zoom.r * 10,
+        step:.1,
+        value: settings.zoom.r,
+        callback(evt) {
+            settings.zoom.r = evt.target.value;
+            draw.step();
+        }
+    })
+    
+    // ZOOM G
+    components.range({
+        parent: containerUI,
+        legend: 'zoom G',
+        min: 0,
+        max: settings.zoom.g * 10,
+        step:.1,
+        value: settings.zoom.g,
+        callback(evt) {
+            settings.zoom.g = evt.target.value;
+            draw.step();
+        }
+    })
+
+    // Threshold R
+    components.range({
+        parent: containerUI,
+        legend: 'Threshold R',
+        min: -1,
+        max: 1,
+        step:.001,
+        value: settings.threshold.r,
+        callback(evt) {
+            settings.threshold.r = evt.target.value;
+            draw.step();
+        }
+    })
+
+    // Threshold G
+    components.range({
+        parent: containerUI,
+        legend: 'Threshold G',
+        min: -1,
+        max: 1,
+        step:.001,
+        value: settings.threshold.g,
+        callback(evt) {
+            settings.threshold.g= evt.target.value;
+            draw.step();
+        }
+    })
+
     // Linie
     create({
         parent: containerUI,

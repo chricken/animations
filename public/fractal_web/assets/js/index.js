@@ -34,16 +34,24 @@ const init = () => {
         fileNo: 0,
         maxFiles: 10800,
         saveFile: false,
-        animate: false,
+        animate: true,
         perlin: new Perlin(settings.p),
+        hue: 0,
+        deltaHue: .1,
+        numPoints: 1e4,
         cSize: {
-            x: ~~(1920 / 3),
-            y: ~~(1040 / 3),
+            x: ~~(1920 / 4),
+            y: ~~(1040 / 4),
         },
         zoom: {
-            r: 100,
-            g: 200,
-            b: 50
+            r: 10,
+            g: 50,
+            b: 35
+        },
+        threshold: {
+            r: 0,
+            g: .25,
+            b: .25,
         },
         pos: {
             x: 1.1,
@@ -51,9 +59,9 @@ const init = () => {
             z: 1.1
         },
         speed: {
-            x: .0,
-            y: .0,
-            z: 10
+            x: .010,
+            y: .010,
+            z: .010
         }
     })
 
