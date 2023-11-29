@@ -8,8 +8,8 @@ class Point {
         this.x = x;
         this.y = y;
 
-        this.speedX = rnd(-100, 100) / 500;
-        this.speedY = rnd(-100, 100) / 500;
+        this.speedX = rnd(-100, 100) / 400;
+        this.speedY = rnd(-100, 100) / 400;
 
         this.hue = settings.hue;
         settings.hue += settings.deltaHue;
@@ -25,12 +25,30 @@ class Point {
 
         this.spX = this.haarLengthSP * Math.cos(this.winkelSP);
         this.spY = this.haarLengthSP * Math.sin(this.winkelSP);
+
+        this.lifetime = rnd(100, 400)
+        this.dead = false;
     }
     update() {
+        this.lifetime--;
         this.x += this.speedX;
         this.y += this.speedY;
         this.checkBorders();
         this.render();
+        if (this.lifetime <= 0 && !this.dead) {
+            this.dead = true;
+        }
+        if (this.dead) {
+            this.haarLength /= 1.2;
+            this.haarLengthSP /= 1.2;
+            if (this.haarLength <= 1) {
+                settings.points = settings.points.filter(point => point != this);
+                settings.points.push(new Point(
+                    rnd(0, settings.cSize.x),
+                    rnd(0, settings.cSize.y)
+                ))
+            }
+        }
     }
     checkBorders() {
         if (this.x < 0) this.x = settings.cSize.x;
@@ -62,7 +80,7 @@ class Point {
 
             ctx.fillStyle = `hsl(${this.hue}, 100%, 50%)`
             ctx.strokeStyle = `hsl(${this.hue}, 80%, 50%)`
-            // ctx.lineWidth = settings.px[this.y][this.x].val;
+            ctx.lineWidth = .7;
 
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
