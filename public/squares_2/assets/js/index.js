@@ -35,40 +35,25 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
+        saveFile: false,
         animate: true,
         perlin: new Perlin(settings.p),
         hue: 0,
-        deltaHue: .0003,
-        numPoints: 2e5,
-        maxHaarLength: .03,  // Anteil an Canvasbreite
+        deltaHue: .03,
         cSize: {
             x: ~~(1920 / divisorRes),
             y: ~~(1040 / divisorRes),
         },
-        zoom: {
-            r: 10,
-            g: 50,
-            b: 35
-        },
-        threshold: { 
-            r: .2,
-            g: .25,
-            b: .25,
-        },
-        pos: {
-            x: 1.1,
-            y: 2.1,
-            z: 1.1
-        },
-        speed: {
-            x: .010,
-            y: .020,
-            z: .20
-        }
+        posX: 0,
+        posY: 0,
+        speedX: 2,
+        speedY: 2,
+        numSquares: 40
     })
 
-    console.log(settings.cSize);
+    settings.squareSize = settings.cSize.x / settings.numSquares;
+
+    console.log(settings.squareSize);
 
     domMapping();
     fillApp();
