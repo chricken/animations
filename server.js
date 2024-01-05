@@ -7,7 +7,7 @@ import betterOpn from 'better-opn';
 
 let server = express();
 
-const projectsToOpn = ['squares_2'];
+const projectsToOpn = ['flowfield_2'];
 
 server.use(express.static('public'));
 server.use((routes));

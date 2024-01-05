@@ -35,7 +35,7 @@ const init = () => {
         basePath: '../results/img',
         fileNo: 0,
         maxFiles: 10800,
-        saveFile: true,
+        saveFile: false,
         animate: true,
         perlin: new Perlin(settings.p),
         hue: 0,
